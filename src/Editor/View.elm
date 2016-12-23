@@ -8,8 +8,10 @@ import Types exposing (Model, ScreenRect)
 import Messages exposing (Msg(CaptureClick))
 import Styles.Stylesheet as Stylesheet exposing (Class(..))
 import Element
+import View.Config as Config exposing (offset)
 import Board.Graph as Graph
 import Board.Canvas as Canvas
+import Utils.Math as Math
 
 
 { class, classList } =
@@ -26,22 +28,23 @@ view model =
 viewBoard : Model -> Html Msg
 viewBoard ({ window, graph } as model) =
     let
+        ( width, height ) =
+            ( window.width - offset.width, window.height - offset.height )
+
         viewportRatio =
-            window.ratio
+            Math.ratio width height
 
         boardRatio =
-            graph.ratio
+            Math.ratio graph.size.x graph.size.y
 
         boardSize =
             if viewportRatio > boardRatio then
-                { width = 300
-                , height = window.height - 150
-                , ratio = boardRatio
+                { width = Math.scale boardRatio height
+                , height = height
                 }
             else
-                { width = window.width - 150
-                , height = 300
-                , ratio = boardRatio
+                { width = width
+                , height = Math.scale boardRatio width
                 }
     in
         div

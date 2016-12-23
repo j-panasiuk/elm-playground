@@ -19,7 +19,7 @@ type alias Model =
 
 
 type alias ScreenRect =
-    WithRatio Window.Size
+    Window.Size
 
 
 type alias ScreenPoint =
@@ -29,14 +29,9 @@ type alias ScreenPoint =
 
 
 type alias GridSize =
-    -- WithRatio
     { x : Int
     , y : Int
     }
-
-
-type alias WithRatio a =
-    { a | ratio : Float }
 
 
 type alias Position =
@@ -57,7 +52,6 @@ type alias Graph =
     , edges : List ( Position, Position )
     , neighbors : Dict Position (Set Position)
     , size : GridSize
-    , ratio : Float
     }
 
 

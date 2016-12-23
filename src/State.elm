@@ -11,7 +11,7 @@ import Task
 
 init : Location -> ( Model, Cmd Msg )
 init location =
-    ( Model (Routes.fromLocation location) { width = 400, height = 400, ratio = 1.0 } Graph.graph
+    ( Model (Routes.fromLocation location) { width = 400, height = 400 } Graph.graph
     , Task.perform Resize Window.size
     )
 
@@ -28,15 +28,8 @@ update msg model =
         NavigateTo url ->
             model ! [ Navigation.newUrl url ]
 
-        Resize { width, height } ->
-            let
-                window =
-                    { width = width
-                    , height = height
-                    , ratio = (toFloat width) / (toFloat height)
-                    }
-            in
-                { model | window = window } ! []
+        Resize windowSize ->
+            { model | window = windowSize } ! []
 
         CaptureClick _ ->
             model ! []

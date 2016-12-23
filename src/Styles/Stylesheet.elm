@@ -79,6 +79,7 @@ stylesheet =
             ]
         , class BoardCanvas
             [ positionBy parent
+            , backgroundColor colors.blue.dark
             ]
         , class BoardOverlay
             [ width (percent 100)

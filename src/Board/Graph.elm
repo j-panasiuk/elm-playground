@@ -2,7 +2,6 @@ module Board.Graph
     exposing
         ( graph
         , size
-        , ratio
         , nodes
         , edges
         , neighbors
@@ -32,7 +31,6 @@ graph =
     , edges = edges
     , neighbors = neighbors
     , size = size
-    , ratio = ratio
     }
 
 
@@ -41,11 +39,6 @@ size =
     { x = nodes |> measureDimension first
     , y = nodes |> measureDimension second
     }
-
-
-ratio : Float
-ratio =
-    (toFloat size.x) / (toFloat size.y)
 
 
 measureDimension : (( Int, Int ) -> Int) -> List ( Int, Int ) -> Int

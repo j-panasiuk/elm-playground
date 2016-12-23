@@ -7,19 +7,11 @@ import Styles.Base exposing (colors)
 import Styles.Stylesheet as Stylesheet exposing (Class(..))
 import Color exposing (Color)
 import FontAwesome as FA
+import View.Config as Config
 
 
 { class, classList } =
     Stylesheet.stylesheet
-
-
-
--- ELEMENTS CONFIG
-
-
-iconSize : Int
-iconSize =
-    32
 
 
 
@@ -45,5 +37,5 @@ sidebar _ =
 icon : (Color -> Int -> Html msg) -> Color -> Html msg
 icon fa color =
     i [ class Icon ]
-        [ fa color iconSize
+        [ fa color Config.iconSize
         ]
