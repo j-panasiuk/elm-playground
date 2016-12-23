@@ -9,7 +9,6 @@ import Messages exposing (Msg(CaptureClick))
 import Styles.Stylesheet as Stylesheet exposing (Class(..))
 import Element
 import View.Config as Config exposing (offset)
-import Board.Graph as Graph
 import Board.Canvas as Canvas
 import Utils.Math as Math
 
