@@ -25,7 +25,7 @@ stylesheet =
         ]
         [ class Main
             [ height (percent 100)
-            , backgroundColor colors.orange
+            , backgroundColor colors.black
             ]
         , class Nav
             [ palette.nav
@@ -46,7 +46,6 @@ stylesheet =
             ]
         , class Container
             [ height (percent 100)
-            , backgroundColor colors.black
             ]
         , class Sidebar
             [ palette.sidebar

@@ -1,10 +1,14 @@
 module Board.Canvas exposing (render)
 
 import Types exposing (Model, ScreenRect, GridSize, Graph)
+import Editor.Types exposing (Mode(Grid, Nodes, Edges))
 import Element exposing (Element)
 import Collage exposing (Form)
+import Color exposing (Color)
 import Styles.Base exposing (colors)
 import Utils.Tuple
+import Utils.Math as Math
+import Board.Config as Config exposing (lineStyle)
 
 
 render : ScreenRect -> Model -> Element
@@ -28,34 +32,227 @@ drawBackground { width, height } =
 
 
 drawGraph : ScreenRect -> Model -> Form
-drawGraph viewport { graph } =
-    [ drawTiles viewport graph
+drawGraph viewport { graph, editor } =
+    case editor.mode of
+        Grid ->
+            [ drawTiles viewport graph
+            , drawLanes viewport graph
+            , drawGridOnTiles viewport graph
+            ]
+                |> Collage.group
+
+        Nodes ->
+            [ drawTiles viewport graph
+            , drawLanes viewport graph
+            , drawNodes viewport graph
+            ]
+                |> Collage.group
+
+        Edges ->
+            [ drawTiles viewport graph
+            , drawLanes viewport graph
+            , drawEdges viewport graph
+            ]
+                |> Collage.group
+
+
+
+-- DRAW GRID
+
+
+drawGridBetweenTiles : ScreenRect -> Graph -> Form
+drawGridBetweenTiles { width, height } { size } =
+    [ List.range 1 (size.x - 1)
+        |> List.map (toGridCoordinate width size.x)
+        |> List.map (drawGridVerticalLine height)
+    , List.range 1 (size.y - 1)
+        |> List.map (toGridCoordinate height size.y)
+        |> List.map (drawGridHorizontalLine width)
     ]
+        |> List.concat
         |> Collage.group
+
+
+drawGridOnTiles : ScreenRect -> Graph -> Form
+drawGridOnTiles { width, height } { size } =
+    [ List.range 0 (size.x - 1)
+        |> List.map (toCoordinate width size.x)
+        |> List.map (drawGridVerticalLine height)
+    , List.range 0 (size.y - 1)
+        |> List.map (toCoordinate height size.y)
+        |> List.map (drawGridHorizontalLine width)
+    ]
+        |> List.concat
+        |> Collage.group
+
+
+drawGridVerticalLine : Int -> Float -> Form
+drawGridVerticalLine height x =
+    gridLine
+        ( ( x, (toFloat -height) / 2 )
+        , ( x, (toFloat height) / 2 )
+        )
+
+
+drawGridHorizontalLine : Int -> Float -> Form
+drawGridHorizontalLine width y =
+    gridLine
+        ( ( (toFloat -width) / 2, y )
+        , ( (toFloat width) / 2, y )
+        )
+
+
+gridLine : ( ( Float, Float ), ( Float, Float ) ) -> Form
+gridLine =
+    line colors.grey.medium 2
+
+
+
+-- DRAW TILES
 
 
 drawTiles : ScreenRect -> Graph -> Form
 drawTiles viewport { nodes, size } =
     nodes
-        |> List.map (toCoordinate viewport size)
-        |> List.map (drawTile 40)
+        |> List.map (toCoordinates viewport size)
+        |> List.map (drawTile (Math.ratio viewport.width size.x))
         |> Collage.group
 
 
-drawTile : Int -> ( Float, Float ) -> Form
-drawTile size ( x, y ) =
-    Collage.square (0.8 * (toFloat size))
+drawTile : Float -> ( Float, Float ) -> Form
+drawTile size coordinates =
+    Collage.square (Config.tileRatio * size)
         |> Collage.filled colors.grey.darker
-        |> Collage.move ( x, y )
+        |> Collage.move coordinates
+
+
+
+-- DRAW LANES
+
+
+drawLanes : ScreenRect -> Graph -> Form
+drawLanes viewport { edges, size } =
+    edges
+        |> List.map (Utils.Tuple.map (toCoordinates viewport size))
+        |> List.map (drawLane (Math.ratio viewport.width size.x))
+        |> Collage.group
+
+
+drawLane : Float -> ( ( Float, Float ), ( Float, Float ) ) -> Form
+drawLane size coordinates =
+    Collage.square (Config.laneRatio * size)
+        |> Collage.filled colors.grey.darker
+        |> Collage.move (Utils.Tuple.middle coordinates)
+
+
+
+-- DRAW NODES
+
+
+drawNodes : ScreenRect -> Graph -> Form
+drawNodes viewport { nodes, size } =
+    nodes
+        |> List.map (toCoordinates viewport size)
+        |> List.map (drawNode (Math.ratio viewport.width size.x))
+        |> Collage.group
+
+
+drawNode : Float -> ( Float, Float ) -> Form
+drawNode size coordinates =
+    drawMarker circle size coordinates
+
+
+
+-- DRAW EDGES
+
+
+drawEdges : ScreenRect -> Graph -> Form
+drawEdges viewport { edges, size } =
+    edges
+        |> List.map (Utils.Tuple.map (toCoordinates viewport size))
+        |> List.map (drawEdge (Math.ratio viewport.width size.x))
+        |> Collage.group
+
+
+drawEdge : Float -> ( ( Float, Float ), ( Float, Float ) ) -> Form
+drawEdge size segment =
+    [ drawConnection line size segment
+    , drawMarker diamond size (Utils.Tuple.middle segment)
+    ]
+        |> Collage.group
+
+
+
+-- SHAPES
+
+
+{-| Draw marker of given shape (circle, diamond). Marker is hollow inside
+-}
+drawMarker :
+    (Color -> Float -> ( Float, Float ) -> Form)
+    -> Float
+    -> ( Float, Float )
+    -> Form
+drawMarker shape size coordinate =
+    [ shape colors.grey.dark (Config.markerRatio * size) coordinate
+    , shape colors.grey.darker ((Config.markerRatio - Config.lineRatio) * size) coordinate
+    ]
+        |> Collage.group
+
+
+circle : Color -> Float -> ( Float, Float ) -> Form
+circle color diameter coordinates =
+    Collage.circle (diameter / 2)
+        |> Collage.filled color
+        |> Collage.move coordinates
+
+
+diamond : Color -> Float -> ( Float, Float ) -> Form
+diamond color length coordinates =
+    Collage.square length
+        |> Collage.filled color
+        |> Collage.move coordinates
+        |> Collage.rotate (degrees 45)
+
+
+{-| Draw connection between two points
+-}
+drawConnection :
+    (Color -> Float -> ( ( Float, Float ), ( Float, Float ) ) -> Form)
+    -> Float
+    -> ( ( Float, Float ), ( Float, Float ) )
+    -> Form
+drawConnection shape size segment =
+    shape colors.grey.dark (Config.lineRatio * size) segment
+
+
+line : Color -> Float -> ( ( Float, Float ), ( Float, Float ) ) -> Form
+line color width segment =
+    Collage.segment (Tuple.first segment) (Tuple.second segment)
+        |> Collage.traced
+            { lineStyle
+                | width = width
+                , color = color
+            }
 
 
 
 -- HELPERS
 
 
-toCoordinate : ScreenRect -> GridSize -> ( Int, Int ) -> ( Float, Float )
-toCoordinate { width, height } { x, y } ( i, j ) =
+toCoordinate : Int -> Int -> Int -> Float
+toCoordinate size x i =
+    (size // (2 * x)) * (2 * i - x + 1) |> toFloat
+
+
+toCoordinates : ScreenRect -> GridSize -> ( Int, Int ) -> ( Float, Float )
+toCoordinates { width, height } { x, y } ( i, j ) =
     ( (width // (2 * x)) * (2 * i - x + 1)
     , (height // (2 * y)) * (2 * j - y + 1)
     )
         |> Utils.Tuple.map toFloat
+
+
+toGridCoordinate : Int -> Int -> Int -> Float
+toGridCoordinate size x i =
+    (-size // 2) + (i * size // x) |> toFloat

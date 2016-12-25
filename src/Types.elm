@@ -6,6 +6,7 @@ import Set exposing (Set)
 import Json.Decode exposing (Decoder, field, int)
 import Window
 import AStar
+import Editor.Types exposing (Editor)
 
 
 -- MODELS
@@ -15,6 +16,7 @@ type alias Model =
     { route : Maybe Route
     , window : ScreenRect
     , graph : Graph
+    , editor : Editor
     }
 
 

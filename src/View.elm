@@ -46,16 +46,14 @@ viewTopNav model =
 
 viewPage : Model -> Html Msg
 viewPage model =
-    div [ class Container ]
+    div [{- class Container -}]
         (case model.route of
             Just (Routes.Game) ->
                 [ Game.View.view model
                 ]
 
             Just (Routes.Editor) ->
-                [ Elements.sidebar model
-                , Editor.View.view model
-                ]
+                Editor.View.view model
 
             Nothing ->
                 []
