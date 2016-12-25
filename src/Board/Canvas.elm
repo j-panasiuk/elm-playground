@@ -35,22 +35,19 @@ drawGraph : ScreenRect -> Model -> Form
 drawGraph viewport { graph, editor } =
     case editor.mode of
         Grid ->
-            [ drawTiles viewport graph
-            , drawLanes viewport graph
-            , drawGridOnTiles viewport graph
+            [ drawMaze viewport graph
+            , drawGridBetweenTiles viewport graph
             ]
                 |> Collage.group
 
         Nodes ->
-            [ drawTiles viewport graph
-            , drawLanes viewport graph
+            [ drawMaze viewport graph
             , drawNodes viewport graph
             ]
                 |> Collage.group
 
         Edges ->
-            [ drawTiles viewport graph
-            , drawLanes viewport graph
+            [ drawMaze viewport graph
             , drawEdges viewport graph
             ]
                 |> Collage.group
@@ -73,8 +70,8 @@ drawGridBetweenTiles { width, height } { size } =
         |> Collage.group
 
 
-drawGridOnTiles : ScreenRect -> Graph -> Form
-drawGridOnTiles { width, height } { size } =
+drawGridAcrossTiles : ScreenRect -> Graph -> Form
+drawGridAcrossTiles { width, height } { size } =
     [ List.range 0 (size.x - 1)
         |> List.map (toCoordinate width size.x)
         |> List.map (drawGridVerticalLine height)
@@ -104,30 +101,34 @@ drawGridHorizontalLine width y =
 
 gridLine : ( ( Float, Float ), ( Float, Float ) ) -> Form
 gridLine =
-    line colors.grey.medium 2
+    line colors.grey.light 2
 
 
 
--- DRAW TILES
+-- DRAW MAZE
 
 
-drawTiles : ScreenRect -> Graph -> Form
-drawTiles viewport { nodes, size } =
-    nodes
-        |> List.map (toCoordinates viewport size)
-        |> List.map (drawTile (Math.ratio viewport.width size.x))
+drawMaze : ScreenRect -> Graph -> Form
+drawMaze viewport graph =
+    [ drawLanes viewport graph
+    , drawCells viewport graph
+    ]
         |> Collage.group
 
 
-drawTile : Float -> ( Float, Float ) -> Form
-drawTile size coordinates =
-    Collage.square (Config.tileRatio * size)
+drawCells : ScreenRect -> Graph -> Form
+drawCells viewport { nodes, size } =
+    nodes
+        |> List.map (toCoordinates viewport size)
+        |> List.map (drawCell (Math.ratio viewport.width size.x))
+        |> Collage.group
+
+
+drawCell : Float -> ( Float, Float ) -> Form
+drawCell size coordinates =
+    Collage.square (Config.cellRatio * size)
         |> Collage.filled colors.grey.darker
         |> Collage.move coordinates
-
-
-
--- DRAW LANES
 
 
 drawLanes : ScreenRect -> Graph -> Form

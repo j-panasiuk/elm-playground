@@ -7,8 +7,8 @@ import Color
 -- RATIOS
 
 
-tileRatio : Float
-tileRatio =
+cellRatio : Float
+cellRatio =
     0.8
 
 
