@@ -55,11 +55,11 @@ update msg model =
         Resize windowSize ->
             { model | window = windowSize } ! []
 
-        CaptureClick _ ->
-            model ! []
-
         SetEditorMode mode ->
             { model | editor = Editor.setMode mode model.editor } ! []
+
+        ClickEditorBoard screenPoint ->
+            model ! []
 
 
 

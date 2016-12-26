@@ -93,6 +93,7 @@ type GameMode
 type alias Editor =
     { mode : EditorMode
     , canvas : List Layer
+    , selection : Selection Selectable
     }
 
 
@@ -100,6 +101,11 @@ type EditorMode
     = CreateMaze
     | SelectNodes
     | SelectEdges
+
+
+type Selectable
+    = Node Position
+    | Edge ( Position, Position )
 
 
 
@@ -112,6 +118,13 @@ type Layer
     | Maze
     | Nodes
     | Edges
+
+
+type Selection a
+    = None
+    | Single (Maybe a)
+    | Double ( Maybe a, Maybe a )
+    | Multiple (Set a)
 
 
 

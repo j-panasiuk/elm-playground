@@ -4,8 +4,8 @@ import Html exposing (..)
 import Html.Attributes exposing (style)
 import Html.Events exposing (on, onClick)
 import Json.Decode
-import Types exposing (Model, ScreenRect, EditorMode(..))
-import Messages exposing (Msg(CaptureClick, SetEditorMode))
+import Types exposing (..)
+import Messages exposing (Msg(..))
 import Styles.Base exposing (colors)
 import Styles.Stylesheet as Stylesheet exposing (Class(..))
 import Color exposing (Color)
@@ -13,7 +13,7 @@ import Element
 import FontAwesome as FA
 import View.Config as Config exposing (offset)
 import Board.Canvas as Canvas
-import Utils.Math as Math
+import Board.Overlay as Overlay
 
 
 { class, classList } =
@@ -61,24 +61,8 @@ viewContent model =
 viewBoard : Model -> Html Msg
 viewBoard ({ window, graph } as model) =
     let
-        ( width, height ) =
-            ( window.width - offset.width, window.height - offset.height )
-
-        viewportRatio =
-            Math.ratio width height
-
-        boardRatio =
-            Math.ratio graph.size.x graph.size.y
-
         boardSize =
-            if viewportRatio > boardRatio then
-                { width = Math.scale boardRatio height
-                , height = height
-                }
-            else
-                { width = width
-                , height = Math.scale boardRatio width
-                }
+            Overlay.size window offset graph
     in
         div
             [ class BoardContainer
@@ -105,7 +89,7 @@ viewBoardOverlay : Model -> Html Msg
 viewBoardOverlay model =
     div
         [ class BoardOverlay
-        , on "click" (Json.Decode.map CaptureClick Types.screenPoint)
+        , on "click" (Json.Decode.map ClickEditorBoard Types.screenPoint)
         ]
         []
 

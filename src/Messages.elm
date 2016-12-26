@@ -10,8 +10,8 @@ type Msg
     | UrlChange Location
     | NavigateTo String
     | Resize Window.Size
-    | CaptureClick ScreenPoint
     | SetEditorMode EditorMode
+    | ClickEditorBoard ScreenPoint
 
 
 
