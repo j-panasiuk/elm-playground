@@ -7,6 +7,7 @@ import Routes
 import Types exposing (Model)
 import Messages exposing (Msg(..))
 import Board.Graph as Graph
+import Game.State as Game
 import Editor.State as Editor
 
 
@@ -25,6 +26,7 @@ initialModel location =
     { route = Routes.fromLocation location
     , window = { width = 400, height = 400 }
     , graph = Graph.graph
+    , game = Game.initialState
     , editor = Editor.initialState
     }
 

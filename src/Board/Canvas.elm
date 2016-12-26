@@ -1,7 +1,6 @@
 module Board.Canvas exposing (render)
 
-import Types exposing (Model, ScreenRect, GridSize, Graph)
-import Editor.Types exposing (Mode(Grid, Nodes, Edges))
+import Types exposing (Model, ScreenRect, GridSize, Graph, Layer(..))
 import Element exposing (Element)
 import Collage exposing (Form)
 import Color exposing (Color)
@@ -11,18 +10,45 @@ import Utils.Math as Math
 import Board.Config as Config exposing (lineStyle)
 
 
-render : ScreenRect -> Model -> Element
-render viewport model =
+render : ScreenRect -> List Layer -> Model -> Element
+render viewport layers model =
     model
-        |> drawBoard viewport
+        |> draw viewport layers
         |> Collage.collage viewport.width viewport.height
 
 
-drawBoard : ScreenRect -> Model -> List Form
-drawBoard viewport model =
-    [ drawBackground viewport
-    , drawGraph viewport model
-    ]
+
+-- CANVAS LAYERS
+
+
+draw : ScreenRect -> List Layer -> Model -> List Form
+draw viewport layers model =
+    Config.layers
+        |> List.filter (\l -> List.member l layers)
+        |> List.map (\l -> drawLayer l viewport model)
+
+
+drawLayer : Layer -> ScreenRect -> Model -> Form
+drawLayer layer viewport { graph } =
+    case layer of
+        Background ->
+            drawBackground viewport
+
+        Maze ->
+            drawMaze viewport graph
+
+        Edges ->
+            drawEdges viewport graph
+
+        Nodes ->
+            drawNodes viewport graph
+
+        Grid ->
+            drawGridBetweenTiles viewport graph
+
+
+
+-- BACKGROUND
 
 
 drawBackground : ScreenRect -> Form
@@ -31,30 +57,8 @@ drawBackground { width, height } =
         |> Collage.filled colors.grey.dark
 
 
-drawGraph : ScreenRect -> Model -> Form
-drawGraph viewport { graph, editor } =
-    case editor.mode of
-        Grid ->
-            [ drawMaze viewport graph
-            , drawGridBetweenTiles viewport graph
-            ]
-                |> Collage.group
 
-        Nodes ->
-            [ drawMaze viewport graph
-            , drawNodes viewport graph
-            ]
-                |> Collage.group
-
-        Edges ->
-            [ drawMaze viewport graph
-            , drawEdges viewport graph
-            ]
-                |> Collage.group
-
-
-
--- DRAW GRID
+-- GRID
 
 
 drawGridBetweenTiles : ScreenRect -> Graph -> Form
@@ -105,7 +109,7 @@ gridLine =
 
 
 
--- DRAW MAZE
+-- MAZE
 
 
 drawMaze : ScreenRect -> Graph -> Form
@@ -147,7 +151,7 @@ drawLane size coordinates =
 
 
 
--- DRAW NODES
+-- NODES
 
 
 drawNodes : ScreenRect -> Graph -> Form
@@ -164,7 +168,7 @@ drawNode size coordinates =
 
 
 
--- DRAW EDGES
+-- EDGES
 
 
 drawEdges : ScreenRect -> Graph -> Form

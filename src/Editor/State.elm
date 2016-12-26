@@ -1,14 +1,31 @@
 module Editor.State exposing (initialState, setMode)
 
-import Editor.Types exposing (Editor, Mode(Grid))
+import Types exposing (Editor, EditorMode(..), Layer(..))
 
 
 initialState : Editor
 initialState =
-    { mode = Grid
+    { mode = CreateMaze
+    , canvas = layers CreateMaze
     }
 
 
-setMode : Mode -> Editor -> Editor
+setMode : EditorMode -> Editor -> Editor
 setMode mode editor =
-    { editor | mode = mode }
+    { editor
+        | mode = mode
+        , canvas = layers mode
+    }
+
+
+layers : EditorMode -> List Layer
+layers mode =
+    case mode of
+        CreateMaze ->
+            [ Background, Maze, Grid ]
+
+        SelectNodes ->
+            [ Background, Maze, Nodes ]
+
+        SelectEdges ->
+            [ Background, Maze, Edges ]

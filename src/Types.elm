@@ -6,18 +6,22 @@ import Set exposing (Set)
 import Json.Decode exposing (Decoder, field, int)
 import Window
 import AStar
-import Editor.Types exposing (Editor)
 
 
--- MODELS
+-- MODEL
 
 
 type alias Model =
     { route : Maybe Route
     , window : ScreenRect
     , graph : Graph
+    , game : Game
     , editor : Editor
     }
+
+
+
+-- SCREEN
 
 
 type alias ScreenRect =
@@ -30,9 +34,24 @@ type alias ScreenPoint =
     }
 
 
-type alias GridSize =
-    { x : Int
-    , y : Int
+
+-- LEVEL
+
+
+type alias Level =
+    { edges : List ( Position, Position )
+    }
+
+
+
+-- GRAPH
+
+
+type alias Graph =
+    { nodes : List Position
+    , edges : List ( Position, Position )
+    , neighbors : Dict Position (Set Position)
+    , size : GridSize
     }
 
 
@@ -44,17 +63,55 @@ type alias Path =
     AStar.Path
 
 
-type alias Level =
-    { edges : List ( Position, Position )
+type alias GridSize =
+    { x : Int
+    , y : Int
     }
 
 
-type alias Graph =
-    { nodes : List Position
-    , edges : List ( Position, Position )
-    , neighbors : Dict Position (Set Position)
-    , size : GridSize
+
+-- GAME
+
+
+type alias Game =
+    { mode : GameMode
+    , canvas : List Layer
     }
+
+
+type GameMode
+    = NotStarted
+    | Playing
+    | Paused
+    | GameOver
+
+
+
+-- EDITOR
+
+
+type alias Editor =
+    { mode : EditorMode
+    , canvas : List Layer
+    }
+
+
+type EditorMode
+    = CreateMaze
+    | SelectNodes
+    | SelectEdges
+
+
+
+-- CANVAS
+
+
+type Layer
+    = Grid
+    | Background
+    | Maze
+    | Nodes
+    | Edges
 
 
 

@@ -4,7 +4,7 @@ import Html exposing (..)
 import Html.Attributes exposing (style)
 import Html.Events exposing (on, onClick)
 import Json.Decode
-import Types exposing (Model, ScreenRect)
+import Types exposing (Model, ScreenRect, EditorMode(..))
 import Messages exposing (Msg(CaptureClick, SetEditorMode))
 import Styles.Base exposing (colors)
 import Styles.Stylesheet as Stylesheet exposing (Class(..))
@@ -14,7 +14,6 @@ import FontAwesome as FA
 import View.Config as Config exposing (offset)
 import Board.Canvas as Canvas
 import Utils.Math as Math
-import Editor.Types exposing (Mode(Grid, Nodes, Edges))
 
 
 { class, classList } =
@@ -33,19 +32,19 @@ viewSidebar { editor } =
     aside [ class Sidebar ]
         [ i
             [ class Icon
-            , onClick (SetEditorMode Grid)
+            , onClick (SetEditorMode CreateMaze)
             ]
-            [ FA.th (activeWhen (editor.mode == Grid)) Config.iconSize ]
+            [ FA.th (activeWhen (editor.mode == CreateMaze)) Config.iconSize ]
         , i
             [ class Icon
-            , onClick (SetEditorMode Nodes)
+            , onClick (SetEditorMode SelectNodes)
             ]
-            [ FA.cog (activeWhen (editor.mode == Nodes)) Config.iconSize ]
+            [ FA.cog (activeWhen (editor.mode == SelectNodes)) Config.iconSize ]
         , i
             [ class Icon
-            , onClick (SetEditorMode Edges)
+            , onClick (SetEditorMode SelectEdges)
             ]
-            [ FA.diamond (activeWhen (editor.mode == Edges)) Config.iconSize ]
+            [ FA.diamond (activeWhen (editor.mode == SelectEdges)) Config.iconSize ]
         ]
 
 
@@ -97,7 +96,7 @@ viewBoardCanvas : ScreenRect -> Model -> Html Msg
 viewBoardCanvas boardSize model =
     div [ class BoardCanvas ]
         [ model
-            |> Canvas.render boardSize
+            |> Canvas.render boardSize model.editor.canvas
             |> Element.toHtml
         ]
 
