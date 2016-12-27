@@ -3,12 +3,14 @@ module Spec.Graph exposing (all)
 import Test exposing (..)
 import Expect
 import Fuzz exposing (Fuzzer)
+import Utils.Fuzzers
 import Random.Pcg as Random exposing (Generator)
 import Shrink exposing (Shrinker)
 import Dict
 import Set
 import List.Extra
 import Utils.Tuple
+import Types exposing (ScreenRect)
 import Board.Graph as Graph
 
 
@@ -234,65 +236,6 @@ isEdge =
                 so we only store one copy (a, b); reversed value (b, a) is not counted as an edge)."""
                 (Graph.isEdge ( to, from ))
     ]
-
-
-
--- CUSTOM FUZZERS
-
-
-{-| Random graph node
--}
-node : Fuzzer ( Int, Int )
-node =
-    let
-        generator : Generator ( Int, Int )
-        generator =
-            Random.sample Graph.nodes
-                |> Random.map (Maybe.withDefault ( 0, 0 ))
-
-        shrinker : Shrinker ( Int, Int )
-        shrinker =
-            Shrink.tuple
-                ( Shrink.int, Shrink.int )
-    in
-        Fuzz.custom generator shrinker
-
-
-{-| Random graph edge
--}
-edge : Fuzzer ( ( Int, Int ), ( Int, Int ) )
-edge =
-    let
-        generator : Generator ( ( Int, Int ), ( Int, Int ) )
-        generator =
-            Random.sample Graph.edges
-                |> Random.map (Maybe.withDefault ( ( 0, 0 ), ( 0, 1 ) ))
-
-        shrinker : Shrinker ( ( Int, Int ), ( Int, Int ) )
-        shrinker =
-            Shrink.tuple
-                ( Shrink.tuple ( Shrink.int, Shrink.int )
-                , Shrink.tuple ( Shrink.int, Shrink.int )
-                )
-    in
-        Fuzz.custom generator shrinker
-
-
-{-| Random position within board boundaries (may not be a graph node!)
--}
-position : Fuzzer ( Int, Int )
-position =
-    Fuzz.tuple ( xRange, yRange )
-
-
-xRange : Fuzzer Int
-xRange =
-    Fuzz.intRange 0 ((.x Graph.size) - 1)
-
-
-yRange : Fuzzer Int
-yRange =
-    Fuzz.intRange 0 ((.y Graph.size) - 1)
 
 
 
