@@ -63,11 +63,11 @@ drawBackground { width, height } =
 
 drawGridBetweenTiles : ScreenRect -> Graph -> Form
 drawGridBetweenTiles { width, height } { size } =
-    [ List.range 1 (size.x - 1)
-        |> List.map (toGridCoordinate width size.x)
+    [ List.range 1 (size.cols - 1)
+        |> List.map (toGridCoordinate width size.cols)
         |> List.map (drawGridVerticalLine height)
-    , List.range 1 (size.y - 1)
-        |> List.map (toGridCoordinate height size.y)
+    , List.range 1 (size.rows - 1)
+        |> List.map (toGridCoordinate height size.rows)
         |> List.map (drawGridHorizontalLine width)
     ]
         |> List.concat
@@ -76,11 +76,11 @@ drawGridBetweenTiles { width, height } { size } =
 
 drawGridAcrossTiles : ScreenRect -> Graph -> Form
 drawGridAcrossTiles { width, height } { size } =
-    [ List.range 0 (size.x - 1)
-        |> List.map (toCoordinate width size.x)
+    [ List.range 0 (size.cols - 1)
+        |> List.map (toCoordinate width size.cols)
         |> List.map (drawGridVerticalLine height)
-    , List.range 0 (size.y - 1)
-        |> List.map (toCoordinate height size.y)
+    , List.range 0 (size.rows - 1)
+        |> List.map (toCoordinate height size.rows)
         |> List.map (drawGridHorizontalLine width)
     ]
         |> List.concat
@@ -124,7 +124,7 @@ drawCells : ScreenRect -> Graph -> Form
 drawCells viewport { nodes, size } =
     nodes
         |> List.map (toCoordinates viewport size)
-        |> List.map (drawCell (Math.ratio viewport.width size.x))
+        |> List.map (drawCell (Math.ratio viewport.width size.cols))
         |> Collage.group
 
 
@@ -139,7 +139,7 @@ drawLanes : ScreenRect -> Graph -> Form
 drawLanes viewport { edges, size } =
     edges
         |> List.map (Utils.Tuple.map (toCoordinates viewport size))
-        |> List.map (drawLane (Math.ratio viewport.width size.x))
+        |> List.map (drawLane (Math.ratio viewport.width size.cols))
         |> Collage.group
 
 
@@ -158,7 +158,7 @@ drawNodes : ScreenRect -> Graph -> Form
 drawNodes viewport { nodes, size } =
     nodes
         |> List.map (toCoordinates viewport size)
-        |> List.map (drawNode (Math.ratio viewport.width size.x))
+        |> List.map (drawNode (Math.ratio viewport.width size.cols))
         |> Collage.group
 
 
@@ -175,7 +175,7 @@ drawEdges : ScreenRect -> Graph -> Form
 drawEdges viewport { edges, size } =
     edges
         |> List.map (Utils.Tuple.map (toCoordinates viewport size))
-        |> List.map (drawEdge (Math.ratio viewport.width size.x))
+        |> List.map (drawEdge (Math.ratio viewport.width size.cols))
         |> Collage.group
 
 
@@ -251,9 +251,9 @@ toCoordinate size x i =
 
 
 toCoordinates : ScreenRect -> GridSize -> ( Int, Int ) -> ( Float, Float )
-toCoordinates { width, height } { x, y } ( i, j ) =
-    ( (width // (2 * x)) * (2 * i - x + 1)
-    , (height // (2 * y)) * (2 * j - y + 1)
+toCoordinates { width, height } { cols, rows } ( i, j ) =
+    ( (width // (2 * cols)) * (2 * i - cols + 1)
+    , (height // (2 * rows)) * (2 * j - rows + 1)
     )
         |> Utils.Tuple.map toFloat
 

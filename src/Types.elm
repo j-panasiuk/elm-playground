@@ -4,8 +4,6 @@ import Routes exposing (Route)
 import Dict exposing (Dict)
 import Set exposing (Set)
 import Json.Decode exposing (Decoder, field, int)
-import Window
-import AStar
 
 
 -- MODEL
@@ -24,8 +22,12 @@ type alias Model =
 -- SCREEN
 
 
+{-| This is redefined `Window.Size`
+-}
 type alias ScreenRect =
-    Window.Size
+    { width : Int
+    , height : Int
+    }
 
 
 type alias ScreenPoint =
@@ -55,17 +57,21 @@ type alias Graph =
     }
 
 
+{-| This is redefined `AStar.Position`
+-}
 type alias Position =
-    AStar.Position
+    ( Int, Int )
 
 
+{-| This is redefined `AStar.Path`
+-}
 type alias Path =
-    AStar.Path
+    List Position
 
 
 type alias GridSize =
-    { x : Int
-    , y : Int
+    { cols : Int
+    , rows : Int
     }
 
 
@@ -125,6 +131,11 @@ type Selection a
     | Single (Maybe a)
     | Double ( Maybe a, Maybe a )
     | Multiple (Set a)
+
+
+type SelectBehavior
+    = Toggle
+    | Add
 
 
 

@@ -36,8 +36,8 @@ graph =
 
 size : GridSize
 size =
-    { x = nodes |> measureDimension first
-    , y = nodes |> measureDimension second
+    { cols = nodes |> measureDimension first
+    , rows = nodes |> measureDimension second
     }
 
 
