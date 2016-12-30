@@ -1,5 +1,7 @@
 module Utils.Math exposing (..)
 
+import Types exposing (ScreenRect)
+
 
 ratio : Int -> Int -> Float
 ratio x y =
@@ -7,6 +9,11 @@ ratio x y =
         (toFloat x) / (toFloat y)
     else
         Debug.crash "Dividing by zero, are we?"
+
+
+rectRatio : ScreenRect -> Float
+rectRatio { width, height } =
+    ratio width height
 
 
 invert : Float -> Float
@@ -19,4 +26,4 @@ invert x =
 
 scale : Float -> Int -> Int
 scale coefficient size =
-    (ceiling << (*) coefficient << toFloat) size
+    (floor << (*) coefficient << toFloat) size

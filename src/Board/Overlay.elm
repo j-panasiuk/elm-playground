@@ -9,25 +9,22 @@ import Utils.Math as Math
     (,)
 
 
-size : ScreenRect -> ScreenRect -> Graph -> ScreenRect
-size window offset { size } =
+size : ScreenRect -> GridSize -> ScreenRect
+size { width, height } { cols, rows } =
     let
-        ( width, height ) =
-            ( window.width - offset.width, window.height - offset.height )
-
         viewportRatio =
             Math.ratio width height
 
         boardRatio =
-            Math.ratio size.cols size.rows
+            Math.ratio cols rows
     in
         if viewportRatio > boardRatio then
-            { width = Math.scale boardRatio height
+            { width = round ((toFloat (height * cols)) / (toFloat rows))
             , height = height
             }
         else
             { width = width
-            , height = Math.scale boardRatio width
+            , height = round ((toFloat (width * rows)) / (toFloat cols))
             }
 
 

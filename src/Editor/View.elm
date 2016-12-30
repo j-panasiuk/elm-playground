@@ -62,7 +62,9 @@ viewBoard : Model -> Html Msg
 viewBoard ({ window, graph } as model) =
     let
         boardSize =
-            Overlay.size window offset graph
+            Overlay.size
+                (ScreenRect (window.width - offset.width) (window.height - offset.height))
+                graph.size
     in
         div
             [ class BoardContainer

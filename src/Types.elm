@@ -133,11 +133,6 @@ type Selection a
     | Multiple (Set a)
 
 
-type SelectBehavior
-    = Toggle
-    | Add
-
-
 
 -- DECODERS
 

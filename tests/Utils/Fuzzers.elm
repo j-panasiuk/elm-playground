@@ -61,54 +61,50 @@ position =
 
 xRange : Fuzzer Int
 xRange =
-    Fuzz.intRange 0 ((.x Graph.size) - 1)
+    Fuzz.intRange 0 ((.cols Graph.size) - 1)
 
 
 yRange : Fuzzer Int
 yRange =
-    Fuzz.intRange 0 ((.y Graph.size) - 1)
+    Fuzz.intRange 0 ((.rows Graph.size) - 1)
 
 
 {-| Random grid size
 
-    { x : Int -- (columns)
-    , y : Int -- (rows)
+    { cols : Int
+    , rows : Int
     }
 -}
 gridSize : Fuzzer GridSize
 gridSize =
-    let
-        generator : Generator GridSize
-        generator =
-            Random.map2 GridSize (Random.int 2 30) (Random.int 2 30)
-
-        shrinker : Shrinker GridSize
-        shrinker { x, y } =
-            Shrink.map GridSize (Shrink.int x)
-                |> Shrink.andMap (Shrink.int y)
-    in
-        Fuzz.custom generator shrinker
+    Fuzz.map2 GridSize (Fuzz.intRange 2 20) (Fuzz.intRange 2 20)
 
 
-{-| Random screen viewport containing board overlay (of equal size)
-
+{-| Random screen viewport
     { width : Int -- (pixels)
     , height : Int -- (pixels)
     }
 -}
-screenRect : Int -> GridSize -> Fuzzer ScreenRect
-screenRect tileSize { x, y } =
-    let
-        generator : Generator ScreenRect
-        generator =
-            Random.map2 ScreenRect (Random.int tileSize (x * tileSize)) (Random.int tileSize (y * tileSize))
+screenRect : Fuzzer ScreenRect
+screenRect =
+    Fuzz.map2 ScreenRect (Fuzz.intRange 160 1600) (Fuzz.intRange 160 1600)
 
-        shrinker : Shrinker ScreenRect
-        shrinker { width, height } =
-            Shrink.map ScreenRect (Shrink.int width)
-                |> Shrink.andMap (Shrink.int height)
+
+{-| Random board viewport, with tiles of given size
+    { width : Int -- (pixels)
+    , height : Int -- (pixels)
+    }
+-}
+boardRect : Int -> GridSize -> Fuzzer ScreenRect
+boardRect tileSize { cols, rows } =
+    let
+        ( minWidth, maxWidth ) =
+            ( 2 * tileSize, cols * tileSize )
+
+        ( minHeight, maxHeight ) =
+            ( 2 * tileSize, rows * tileSize )
     in
-        Fuzz.custom generator shrinker
+        Fuzz.map2 ScreenRect (Fuzz.intRange minWidth maxWidth) (Fuzz.intRange maxHeight maxHeight)
 
 
 {-| Random screen point within board overlay
@@ -119,15 +115,5 @@ screenRect tileSize { x, y } =
     }
 -}
 screenPoint : ( Int, Int ) -> Fuzzer ScreenPoint
-screenPoint ( width, height ) =
-    let
-        generator : Generator ScreenPoint
-        generator =
-            Random.map2 ScreenPoint (Random.int 0 width) (Random.int 0 height)
-
-        shrinker : Shrinker ScreenPoint
-        shrinker { layerX, layerY } =
-            Shrink.map ScreenPoint (Shrink.int layerX)
-                |> Shrink.andMap (Shrink.int layerY)
-    in
-        Fuzz.custom generator shrinker
+screenPoint ( maxWidth, maxHeight ) =
+    Fuzz.map2 ScreenPoint (Fuzz.intRange 0 maxWidth) (Fuzz.intRange 0 maxHeight)

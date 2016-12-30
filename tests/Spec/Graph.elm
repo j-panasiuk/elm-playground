@@ -2,15 +2,11 @@ module Spec.Graph exposing (all)
 
 import Test exposing (..)
 import Expect
-import Fuzz exposing (Fuzzer)
-import Utils.Fuzzers
-import Random.Pcg as Random exposing (Generator)
-import Shrink exposing (Shrinker)
+import Utils.Fuzzers as Fz
 import Dict
 import Set
 import List.Extra
 import Utils.Tuple
-import Types exposing (ScreenRect)
 import Board.Graph as Graph
 
 
@@ -31,11 +27,11 @@ size : List Test
 size =
     [ test "horizontal" <|
         \() ->
-            Expect.atLeast 2 (.x Graph.size)
+            Expect.atLeast 2 (.cols Graph.size)
       ----
     , test "vertical" <|
         \() ->
-            Expect.atLeast 2 (.y Graph.size)
+            Expect.atLeast 2 (.rows Graph.size)
     ]
 
 
@@ -116,7 +112,7 @@ neighbors =
             in
                 Expect.true "Expected node to have at least one neighbor!" eachNodeHasNeighbors
       ----
-    , fuzz position "should be symmetrical for every position pair" <|
+    , fuzz Fz.position "should be symmetrical for every position pair" <|
         \origin ->
             let
                 potentialNeighbors =
@@ -135,13 +131,13 @@ neighbors =
 
 findPath : List Test
 findPath =
-    [ fuzz edge "should find path between neighbor nodes" <|
+    [ fuzz Fz.edge "should find path between neighbor nodes" <|
         \( from, to ) ->
             Graph.findPath from to
                 |> Maybe.withDefault []
                 |> Expect.equalLists [ to ]
       ----
-    , fuzz2 node node "should find path between distant nodes" <|
+    , fuzz2 Fz.node Fz.node "should find path between distant nodes" <|
         \from to ->
             let
                 distance =
@@ -160,17 +156,17 @@ findPath =
             in
                 Expect.true "Expected at least 2 distance between nodes" isValid
       ----
-    , fuzz node "should find empty path between position and itself" <|
+    , fuzz Fz.node "should find empty path between position and itself" <|
         \origin ->
             Graph.findPath origin origin
                 |> Expect.equal (Just [])
       ----
-    , fuzz node "should find no path to position outside of graph" <|
+    , fuzz Fz.node "should find no path to position outside of graph" <|
         \origin ->
             Graph.findPath origin ( -1, 0 )
                 |> Expect.equal Nothing
       ----
-    , fuzz2 node node "should find paths of equal length in both directions" <|
+    , fuzz2 Fz.node Fz.node "should find paths of equal length in both directions" <|
         \from to ->
             let
                 dropLastElement =
@@ -225,11 +221,11 @@ isEdge =
         \() ->
             Expect.false "Expected outside position to return false!" (Graph.isEdge ( ( -1, 0 ), ( 0, 0 ) ))
       ----
-    , fuzz node "should return false given same position twice" <|
+    , fuzz Fz.node "should return false given same position twice" <|
         \origin ->
             Expect.false "Expected outside position to return false!" (Graph.isEdge ( origin, origin ))
       ----
-    , fuzz edge "should return false given reversed graph edge" <|
+    , fuzz Fz.edge "should return false given reversed graph edge" <|
         \( from, to ) ->
             Expect.false
                 """Expected reversed graph edge to return false (edges are always bidirectional,
