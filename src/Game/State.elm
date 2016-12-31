@@ -6,7 +6,9 @@ import Types exposing (Game, GameMode(NotStarted), Layer(..))
 initialState : Game
 initialState =
     { mode = NotStarted
-    , canvas = [ Background, Maze ]
+    , canvas =
+        { layers = [ Background, Maze ]
+        }
     }
 
 

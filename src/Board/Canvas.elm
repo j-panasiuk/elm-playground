@@ -1,6 +1,6 @@
 module Board.Canvas exposing (render)
 
-import Types exposing (Model, ScreenRect, GridSize, Graph, Layer(..))
+import Types exposing (Model, ScreenRect, GridSize, Graph, Canvas, Layer(..))
 import Element exposing (Element)
 import Collage exposing (Form)
 import Color exposing (Color)
@@ -10,8 +10,8 @@ import Utils.Math as Math
 import Board.Config as Config exposing (lineStyle)
 
 
-render : ScreenRect -> List Layer -> Model -> Element
-render viewport layers model =
+render : ScreenRect -> Canvas -> Model -> Element
+render viewport { layers } model =
     model
         |> draw viewport layers
         |> Collage.collage viewport.width viewport.height

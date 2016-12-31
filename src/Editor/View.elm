@@ -13,7 +13,6 @@ import Element
 import FontAwesome as FA
 import View.Config as Config exposing (offset)
 import Board.Canvas as Canvas
-import Board.Overlay as Overlay
 
 
 { class, classList } =
@@ -32,19 +31,19 @@ viewSidebar { editor } =
     aside [ class Sidebar ]
         [ i
             [ class Icon
-            , onClick (SetEditorMode CreateMaze)
+            , onClick (SetEditorMode ShowMaze)
             ]
-            [ FA.th (activeWhen (editor.mode == CreateMaze)) Config.iconSize ]
+            [ FA.th (activeWhen (editor.mode == ShowMaze)) Config.iconSize ]
         , i
             [ class Icon
-            , onClick (SetEditorMode SelectNodes)
+            , onClick (SetEditorMode ShowNodes)
             ]
-            [ FA.cog (activeWhen (editor.mode == SelectNodes)) Config.iconSize ]
+            [ FA.cog (activeWhen (editor.mode == ShowNodes)) Config.iconSize ]
         , i
             [ class Icon
-            , onClick (SetEditorMode SelectEdges)
+            , onClick (SetEditorMode ShowEdges)
             ]
-            [ FA.diamond (activeWhen (editor.mode == SelectEdges)) Config.iconSize ]
+            [ FA.diamond (activeWhen (editor.mode == ShowEdges)) Config.iconSize ]
         ]
 
 
@@ -59,23 +58,17 @@ viewContent model =
 
 
 viewBoard : Model -> Html Msg
-viewBoard ({ window, graph } as model) =
-    let
-        boardSize =
-            Overlay.size
-                (ScreenRect (window.width - offset.width) (window.height - offset.height))
-                graph.size
-    in
-        div
-            [ class BoardContainer
-            , style
-                [ ( "width", toString boardSize.width ++ "px" )
-                , ( "height", toString boardSize.height ++ "px" )
-                ]
+viewBoard ({ board } as model) =
+    div
+        [ class BoardContainer
+        , style
+            [ ( "width", toString board.viewport.width ++ "px" )
+            , ( "height", toString board.viewport.height ++ "px" )
             ]
-            [ viewBoardCanvas boardSize model
-            , viewBoardOverlay model
-            ]
+        ]
+        [ viewBoardCanvas board.viewport model
+        , viewBoardOverlay model
+        ]
 
 
 viewBoardCanvas : ScreenRect -> Model -> Html Msg

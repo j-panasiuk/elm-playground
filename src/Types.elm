@@ -13,6 +13,7 @@ type alias Model =
     { route : Maybe Route
     , window : ScreenRect
     , graph : Graph
+    , board : Board
     , game : Game
     , editor : Editor
     }
@@ -76,12 +77,23 @@ type alias GridSize =
 
 
 
+-- BOARD
+
+
+type alias Board =
+    { viewport : ScreenRect
+    , ratio : Float
+    , tileSize : Int
+    }
+
+
+
 -- GAME
 
 
 type alias Game =
     { mode : GameMode
-    , canvas : List Layer
+    , canvas : Canvas
     }
 
 
@@ -98,24 +110,30 @@ type GameMode
 
 type alias Editor =
     { mode : EditorMode
-    , canvas : List Layer
-    , selection : Selection Selectable
+    , canvas : Canvas
+    , selection : EditorSelection
     }
 
 
 type EditorMode
-    = CreateMaze
-    | SelectNodes
-    | SelectEdges
+    = ShowMaze
+    | ShowNodes
+    | ShowEdges
 
 
-type Selectable
-    = Node Position
-    | Edge ( Position, Position )
+type EditorSelection
+    = NothingToSelect
+    | NodeSelection (Selection Position)
+    | EdgeSelection (Selection ( Position, Position ))
 
 
 
 -- CANVAS
+
+
+type alias Canvas =
+    { layers : List Layer
+    }
 
 
 type Layer
@@ -127,13 +145,12 @@ type Layer
 
 
 type Selection a
-    = None
-    | Single (Maybe a)
-    | Double ( Maybe a, Maybe a )
-    | Multiple (Set a)
+    = Single (Maybe a)
 
 
 
+-- | Double ( Maybe a, Maybe a )
+-- | Multiple (Set a)
 -- DECODERS
 
 

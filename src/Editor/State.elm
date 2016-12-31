@@ -1,22 +1,56 @@
-module Editor.State exposing (initialState, setMode)
+module Editor.State exposing (initialState, setMode, select)
 
 import Types exposing (..)
+import Board.Overlay as Overlay
+
+
+-- INIT
 
 
 initialState : Editor
 initialState =
-    { mode = CreateMaze
-    , canvas = layers CreateMaze
-    , selection = selection CreateMaze
+    { mode = ShowMaze
+    , canvas = initCanvas ShowMaze
+    , selection = initSelection ShowMaze
     }
 
 
+initCanvas : EditorMode -> Canvas
+initCanvas mode =
+    { layers = layers mode
+    }
+
+
+initSelection : EditorMode -> EditorSelection
+initSelection mode =
+    case mode of
+        ShowMaze ->
+            NothingToSelect
+
+        ShowNodes ->
+            NodeSelection (Single Nothing)
+
+        ShowEdges ->
+            EdgeSelection (Single Nothing)
+
+
+
+-- UPDATE
+
+
 setMode : EditorMode -> Editor -> Editor
-setMode mode editor =
+setMode mode ({ canvas } as editor) =
     { editor
         | mode = mode
-        , canvas = layers mode
-        , selection = selection mode
+        , canvas = { canvas | layers = layers mode }
+        , selection = initSelection mode
+    }
+
+
+select : Int -> ScreenPoint -> Editor -> Editor
+select tileSize screenPoint editor =
+    { editor
+        | selection = selectPoint tileSize screenPoint editor.selection
     }
 
 
@@ -27,34 +61,27 @@ setMode mode editor =
 layers : EditorMode -> List Layer
 layers mode =
     case mode of
-        CreateMaze ->
+        ShowMaze ->
             [ Background, Maze, Grid ]
 
-        SelectNodes ->
+        ShowNodes ->
             [ Background, Maze, Nodes ]
 
-        SelectEdges ->
+        ShowEdges ->
             [ Background, Maze, Edges ]
 
 
-selection : EditorMode -> Selection Selectable
-selection mode =
-    case mode of
-        CreateMaze ->
-            None
+{-| Translate selected board point to selectable object and add it to selection.
+For now let's assume there is no toggle-select behaviour.
+-}
+selectPoint : Int -> ScreenPoint -> EditorSelection -> EditorSelection
+selectPoint tileSize screenPoint selection =
+    case selection of
+        NothingToSelect ->
+            NothingToSelect
 
-        SelectNodes ->
-            Single (Just (Node ( 0, 0 )))
+        NodeSelection n ->
+            NodeSelection (Single (Just (Overlay.toPosition tileSize screenPoint)))
 
-        SelectEdges ->
-            Single (Just (Edge ( ( 0, 0 ), ( 0, 1 ) )))
-
-
-
--- select : ScreenPoint -> Selection Selectable -> Selection Selectable
--- select screenPoint selection =
---     case selection of
---         None -> None
---         Single selectable -> Single (switch to selected one...)
---         Double (selectable1, selectable2) -> Double (update somehow...)
---         Multiple selectables -> Multiple (toggle selected one...)
+        EdgeSelection e ->
+            EdgeSelection (Single (Just (Overlay.toPositionPair tileSize screenPoint)))

@@ -4,9 +4,11 @@ import Navigation exposing (Location)
 import Window
 import Task
 import Routes
-import Types exposing (Model)
+import Types exposing (..)
 import Messages exposing (Msg(..))
 import Board.Graph as Graph
+import Board.Board as Board
+import Board.Overlay as Overlay
 import Game.State as Game
 import Editor.State as Editor
 
@@ -24,8 +26,9 @@ init location =
 initialModel : Location -> Model
 initialModel location =
     { route = Routes.fromLocation location
-    , window = { width = 400, height = 400 }
+    , window = initialWindow
     , graph = Graph.graph
+    , board = Board.resize initialWindow (.size Graph.graph)
     , game = Game.initialState
     , editor = Editor.initialState
     }
@@ -36,12 +39,17 @@ initialCommand =
     Task.perform Resize Window.size
 
 
+initialWindow : ScreenRect
+initialWindow =
+    { width = 400, height = 400 }
+
+
 
 -- UPDATE
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
-update msg model =
+update msg ({ graph, board, editor } as model) =
     case msg of
         NoOp ->
             model ! []
@@ -53,13 +61,17 @@ update msg model =
             model ! [ Navigation.newUrl url ]
 
         Resize windowSize ->
-            { model | window = windowSize } ! []
+            ( model
+                |> (\m -> { m | window = windowSize })
+                |> (\m -> { m | board = Board.resize (Overlay.shrinkBy { width = 140, height = 140 } windowSize) graph.size })
+            , Cmd.none
+            )
 
         SetEditorMode mode ->
-            { model | editor = Editor.setMode mode model.editor } ! []
+            { model | editor = Editor.setMode mode editor } ! []
 
         ClickEditorBoard screenPoint ->
-            model ! []
+            { model | editor = Editor.select board.tileSize (Overlay.flipVertical board.viewport.height screenPoint) editor } ! []
 
 
 
