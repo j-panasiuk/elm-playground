@@ -44,6 +44,11 @@ viewSidebar { editor } =
             , onClick (SetEditorMode ShowEdges)
             ]
             [ FA.diamond (activeWhen (editor.mode == ShowEdges)) Config.iconSize ]
+        , i
+            [ class Icon
+            , onClick (SetEditorMode ShowPath)
+            ]
+            [ FA.share_alt (activeWhen (editor.mode == ShowPath)) Config.iconSize ]
         ]
 
 

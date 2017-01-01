@@ -119,6 +119,7 @@ type EditorMode
     = ShowMaze
     | ShowNodes
     | ShowEdges
+    | ShowPath
 
 
 type EditorSelection
@@ -147,6 +148,8 @@ type Layer
 
 type Selection a
     = Single (Maybe a)
+    | Double ( Maybe a, Maybe a )
+    | Multiple (Set a)
 
 
 

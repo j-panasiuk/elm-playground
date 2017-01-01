@@ -1,4 +1,4 @@
-module Board.Canvas exposing (render)
+module Board.Canvas exposing (init, render)
 
 import Types exposing (..)
 import Element exposing (Element)
@@ -8,6 +8,52 @@ import Styles.Base exposing (colors)
 import Utils.Tuple
 import Utils.Math as Math
 import Board.Config as Config exposing (lineStyle)
+import Board.Selection as Selection
+
+
+-- INIT
+
+
+init : EditorMode -> Canvas
+init mode =
+    { layers = layers mode
+    }
+
+
+layers : EditorMode -> List Layer
+layers mode =
+    case mode of
+        ShowMaze ->
+            [ BackgroundLayer
+            , MazeLayer
+            , GridLayer
+            ]
+
+        ShowNodes ->
+            [ BackgroundLayer
+            , MazeLayer
+            , NodeLayer
+            , SelectionLayer
+            ]
+
+        ShowEdges ->
+            [ BackgroundLayer
+            , MazeLayer
+            , EdgeLayer
+            , SelectionLayer
+            ]
+
+        ShowPath ->
+            [ BackgroundLayer
+            , MazeLayer
+            , NodeLayer
+            , EdgeLayer
+            , SelectionLayer
+            ]
+
+
+
+-- VIEW
 
 
 render : ScreenRect -> Canvas -> Model -> Element
@@ -208,26 +254,26 @@ drawSelection viewport graph selection =
 
 
 drawSelectedNodes : ScreenRect -> Graph -> Selection Position -> Form
-drawSelectedNodes viewport { nodes, size } (Single selectedNode) =
+drawSelectedNodes viewport { nodes, size } selection =
     let
-        isSelected n =
-            n == Maybe.withDefault ( -1, -1 ) selectedNode
+        selectedNodes =
+            Selection.toValues selection
     in
         nodes
-            |> List.filter isSelected
+            |> List.filter (Selection.isSelected selectedNodes)
             |> List.map (toCoordinates viewport size)
             |> List.map (drawSelectedNode (Math.ratio viewport.width size.cols))
             |> Collage.group
 
 
 drawSelectedEdges : ScreenRect -> Graph -> Selection ( Position, Position ) -> Form
-drawSelectedEdges viewport { edges, size } (Single selectedEdge) =
+drawSelectedEdges viewport { edges, size } selection =
     let
-        isSelected e =
-            e == Maybe.withDefault ( ( -1, -1 ), ( -1, -1 ) ) selectedEdge
+        selectedEdges =
+            Selection.toValues selection
     in
         edges
-            |> List.filter isSelected
+            |> List.filter (Selection.isSelected selectedEdges)
             |> List.map (Utils.Tuple.map (toCoordinates viewport size))
             |> List.map (drawSelectedEdge (Math.ratio viewport.width size.cols))
             |> Collage.group
