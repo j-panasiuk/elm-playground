@@ -2,7 +2,7 @@ module Board.Config exposing (..)
 
 import Collage exposing (LineStyle, LineCap(Round), LineJoin(Smooth))
 import Color
-import Types exposing (Layer(..))
+import Types exposing (..)
 
 
 -- LAYER ORDER
@@ -10,11 +10,12 @@ import Types exposing (Layer(..))
 
 layers : List Layer
 layers =
-    [ Background
-    , Maze
-    , Edges
-    , Nodes
-    , Grid
+    [ BackgroundLayer
+    , MazeLayer
+    , EdgeLayer
+    , NodeLayer
+    , GridLayer
+    , SelectionLayer
     ]
 
 

@@ -1,6 +1,6 @@
 module Board.Canvas exposing (render)
 
-import Types exposing (Model, ScreenRect, GridSize, Graph, Canvas, Layer(..))
+import Types exposing (..)
 import Element exposing (Element)
 import Collage exposing (Form)
 import Color exposing (Color)
@@ -29,22 +29,25 @@ draw viewport layers model =
 
 
 drawLayer : Layer -> ScreenRect -> Model -> Form
-drawLayer layer viewport { graph } =
+drawLayer layer viewport { graph, editor } =
     case layer of
-        Background ->
+        BackgroundLayer ->
             drawBackground viewport
 
-        Maze ->
+        MazeLayer ->
             drawMaze viewport graph
 
-        Edges ->
+        EdgeLayer ->
             drawEdges viewport graph
 
-        Nodes ->
+        NodeLayer ->
             drawNodes viewport graph
 
-        Grid ->
+        GridLayer ->
             drawGridBetweenTiles viewport graph
+
+        SelectionLayer ->
+            drawSelection viewport graph editor.selection
 
 
 
@@ -183,6 +186,62 @@ drawEdge : Float -> ( ( Float, Float ), ( Float, Float ) ) -> Form
 drawEdge size segment =
     [ drawConnection line size segment
     , drawMarker diamond size (Utils.Tuple.middle segment)
+    ]
+        |> Collage.group
+
+
+
+-- SELECTION
+
+
+drawSelection : ScreenRect -> Graph -> EditorSelection -> Form
+drawSelection viewport graph selection =
+    case selection of
+        NothingToSelect ->
+            Element.empty |> Collage.toForm
+
+        NodeSelection selectionPosition ->
+            drawSelectedNodes viewport graph selectionPosition
+
+        EdgeSelection selectionPositionPair ->
+            drawSelectedEdges viewport graph selectionPositionPair
+
+
+drawSelectedNodes : ScreenRect -> Graph -> Selection Position -> Form
+drawSelectedNodes viewport { nodes, size } (Single selectedNode) =
+    let
+        isSelected n =
+            n == Maybe.withDefault ( -1, -1 ) selectedNode
+    in
+        nodes
+            |> List.filter isSelected
+            |> List.map (toCoordinates viewport size)
+            |> List.map (drawSelectedNode (Math.ratio viewport.width size.cols))
+            |> Collage.group
+
+
+drawSelectedEdges : ScreenRect -> Graph -> Selection ( Position, Position ) -> Form
+drawSelectedEdges viewport { edges, size } (Single selectedEdge) =
+    let
+        isSelected e =
+            e == Maybe.withDefault ( ( -1, -1 ), ( -1, -1 ) ) selectedEdge
+    in
+        edges
+            |> List.filter isSelected
+            |> List.map (Utils.Tuple.map (toCoordinates viewport size))
+            |> List.map (drawSelectedEdge (Math.ratio viewport.width size.cols))
+            |> Collage.group
+
+
+drawSelectedNode : Float -> ( Float, Float ) -> Form
+drawSelectedNode size coordinates =
+    circle colors.orange (Config.markerRatio * size) coordinates
+
+
+drawSelectedEdge : Float -> ( ( Float, Float ), ( Float, Float ) ) -> Form
+drawSelectedEdge size segment =
+    [ line colors.orange (Config.lineRatio * size) segment
+    , diamond colors.orange (Config.markerRatio * size) (Utils.Tuple.middle segment)
     ]
         |> Collage.group
 

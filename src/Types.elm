@@ -137,11 +137,12 @@ type alias Canvas =
 
 
 type Layer
-    = Grid
-    | Background
-    | Maze
-    | Nodes
-    | Edges
+    = GridLayer
+    | BackgroundLayer
+    | MazeLayer
+    | NodeLayer
+    | EdgeLayer
+    | SelectionLayer
 
 
 type Selection a
@@ -149,8 +150,6 @@ type Selection a
 
 
 
--- | Double ( Maybe a, Maybe a )
--- | Multiple (Set a)
 -- DECODERS
 
 

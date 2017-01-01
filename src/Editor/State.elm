@@ -62,13 +62,24 @@ layers : EditorMode -> List Layer
 layers mode =
     case mode of
         ShowMaze ->
-            [ Background, Maze, Grid ]
+            [ BackgroundLayer
+            , MazeLayer
+            , GridLayer
+            ]
 
         ShowNodes ->
-            [ Background, Maze, Nodes ]
+            [ BackgroundLayer
+            , MazeLayer
+            , NodeLayer
+            , SelectionLayer
+            ]
 
         ShowEdges ->
-            [ Background, Maze, Edges ]
+            [ BackgroundLayer
+            , MazeLayer
+            , EdgeLayer
+            , SelectionLayer
+            ]
 
 
 {-| Translate selected board point to selectable object and add it to selection.

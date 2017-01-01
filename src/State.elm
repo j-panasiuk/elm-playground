@@ -52,26 +52,51 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg ({ graph, board, editor } as model) =
     case msg of
         NoOp ->
-            model ! []
-
-        UrlChange location ->
-            { model | route = Routes.fromLocation location } ! []
-
-        NavigateTo url ->
-            model ! [ Navigation.newUrl url ]
-
-        Resize windowSize ->
             ( model
-                |> (\m -> { m | window = windowSize })
-                |> (\m -> { m | board = Board.resize (Overlay.shrinkBy { width = 140, height = 140 } windowSize) graph.size })
             , Cmd.none
             )
 
-        SetEditorMode mode ->
-            { model | editor = Editor.setMode mode editor } ! []
+        UrlChange location ->
+            ( { model | route = Routes.fromLocation location }
+            , Cmd.none
+            )
 
-        ClickEditorBoard screenPoint ->
-            { model | editor = Editor.select board.tileSize (Overlay.flipVertical board.viewport.height screenPoint) editor } ! []
+        NavigateTo url ->
+            ( model
+            , Navigation.newUrl url
+            )
+
+        Resize windowSize ->
+            let
+                updatedBoard =
+                    graph.size |> Board.resize (Overlay.shrinkBy offset windowSize)
+
+                offset =
+                    { width = 140, height = 140 }
+            in
+                ( { model
+                    | window = windowSize
+                    , board = updatedBoard
+                  }
+                , Cmd.none
+                )
+
+        SetEditorMode mode ->
+            ( { model | editor = Editor.setMode mode editor }
+            , Cmd.none
+            )
+
+        ClickEditorBoard clickPoint ->
+            let
+                updatedEditor =
+                    editor |> Editor.select board.tileSize translatedPoint
+
+                translatedPoint =
+                    clickPoint |> Overlay.flipVertical board.viewport.height
+            in
+                ( { model | editor = updatedEditor }
+                , Cmd.none
+                )
 
 
 

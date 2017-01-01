@@ -7,7 +7,7 @@ initialState : Game
 initialState =
     { mode = NotStarted
     , canvas =
-        { layers = [ Background, Maze ]
+        { layers = [ BackgroundLayer, MazeLayer ]
         }
     }
 
