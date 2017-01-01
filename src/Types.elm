@@ -124,8 +124,8 @@ type EditorMode
 
 type EditorSelection
     = NothingToSelect
-    | NodeSelection (Selection Position)
-    | EdgeSelection (Selection ( Position, Position ))
+    | NodeSelection SelectMode (Selection Position)
+    | EdgeSelection SelectMode (Selection ( Position, Position ))
 
 
 
@@ -150,6 +150,11 @@ type Selection a
     = Single (Maybe a)
     | Double ( Maybe a, Maybe a )
     | Multiple (Set a)
+
+
+type SelectMode
+    = Add
+    | Toggle
 
 
 

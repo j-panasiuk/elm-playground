@@ -246,10 +246,10 @@ drawSelection viewport graph selection =
         NothingToSelect ->
             Element.empty |> Collage.toForm
 
-        NodeSelection selectionPosition ->
+        NodeSelection _ selectionPosition ->
             drawSelectedNodes viewport graph selectionPosition
 
-        EdgeSelection selectionPositionPair ->
+        EdgeSelection _ selectionPositionPair ->
             drawSelectedEdges viewport graph selectionPositionPair
 
 

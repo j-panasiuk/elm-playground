@@ -15,13 +15,13 @@ init mode =
             NothingToSelect
 
         ShowNodes ->
-            NodeSelection (Single Nothing)
+            NodeSelection Toggle (Single Nothing)
 
         ShowEdges ->
-            EdgeSelection (Multiple Set.empty)
+            EdgeSelection Add (Multiple Set.empty)
 
         ShowPath ->
-            NodeSelection (Double ( Nothing, Nothing ))
+            NodeSelection Toggle (Double ( Nothing, Nothing ))
 
 
 
@@ -37,15 +37,33 @@ selectPoint tileSize screenPoint selection =
         NothingToSelect ->
             NothingToSelect
 
-        NodeSelection nodeSelection ->
-            NodeSelection (addToSelection nodeSelection (Overlay.toPosition tileSize screenPoint))
+        NodeSelection mode nodeSelection ->
+            let
+                updatedSelection =
+                    (handleSelect mode) (Overlay.toPosition tileSize screenPoint) nodeSelection
+            in
+                NodeSelection mode updatedSelection
 
-        EdgeSelection edgeSelection ->
-            EdgeSelection (addToSelection edgeSelection (Overlay.toPositionPair tileSize screenPoint))
+        EdgeSelection mode edgeSelection ->
+            let
+                updatedSelection =
+                    (handleSelect mode) (Overlay.toPositionPair tileSize screenPoint) edgeSelection
+            in
+                EdgeSelection mode updatedSelection
 
 
-addToSelection : Selection comparable -> comparable -> Selection comparable
-addToSelection selection value =
+handleSelect : SelectMode -> (comparable -> Selection comparable -> Selection comparable)
+handleSelect mode =
+    case mode of
+        Add ->
+            add
+
+        Toggle ->
+            toggle
+
+
+add : comparable -> Selection comparable -> Selection comparable
+add value selection =
     case selection of
         Single _ ->
             Single (Just value)
@@ -64,6 +82,58 @@ addToSelection selection value =
 
         Multiple values ->
             Multiple (Set.insert value values)
+
+
+toggle : comparable -> Selection comparable -> Selection comparable
+toggle value selection =
+    case selection of
+        Single Nothing ->
+            Single (Just value)
+
+        Single (Just v) ->
+            Single
+                (if value == v then
+                    Nothing
+                 else
+                    Just value
+                )
+
+        Double ( Nothing, Nothing ) ->
+            Double ( Just value, Nothing )
+
+        Double ( Just v1, Nothing ) ->
+            Double
+                (if value == v1 then
+                    ( Nothing, Nothing )
+                 else
+                    ( Just v1, Just value )
+                )
+
+        Double ( Nothing, Just v2 ) ->
+            Double
+                (if value == v2 then
+                    ( Nothing, Nothing )
+                 else
+                    ( Just v2, Just value )
+                )
+
+        Double ( Just v1, Just v2 ) ->
+            Double
+                (if value == v1 then
+                    ( Just v2, Nothing )
+                 else if value == v2 then
+                    ( Just v1, Nothing )
+                 else
+                    ( Just v1, Just value )
+                )
+
+        Multiple values ->
+            Multiple
+                (if Set.member value values then
+                    Set.remove value values
+                 else
+                    Set.insert value values
+                )
 
 
 {-| Check if value is currently selected
