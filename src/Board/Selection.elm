@@ -145,8 +145,8 @@ isSelected selectedValues v =
 
 {-| Unpack all values from selection into a set
 -}
-toValues : Selection comparable -> Set comparable
-toValues selection =
+toSet : Selection comparable -> Set comparable
+toSet selection =
     case selection of
         Single (Just value) ->
             Set.singleton value
@@ -168,3 +168,10 @@ toValues selection =
 
         Multiple values ->
             values
+
+
+{-| Unpack all values from selection into a list
+-}
+toList : Selection comparable -> List comparable
+toList =
+    toSet >> Set.toList

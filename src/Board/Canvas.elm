@@ -84,10 +84,10 @@ drawLayer layer viewport { graph, editor } =
             drawMaze viewport graph
 
         EdgeLayer ->
-            drawEdges viewport graph
+            drawEdges viewport graph graph.edges
 
         NodeLayer ->
-            drawNodes viewport graph
+            drawNodes viewport graph graph.nodes
 
         GridLayer ->
             drawGridBetweenTiles viewport graph
@@ -163,18 +163,15 @@ gridLine =
 
 drawMaze : ScreenRect -> Graph -> Form
 drawMaze viewport graph =
-    [ drawLanes viewport graph
-    , drawCells viewport graph
+    [ drawLanes viewport graph graph.edges
+    , drawCells viewport graph graph.nodes
     ]
         |> Collage.group
 
 
-drawCells : ScreenRect -> Graph -> Form
-drawCells viewport { nodes, size } =
-    nodes
-        |> List.map (toCoordinates viewport size)
-        |> List.map (drawCell (Math.ratio viewport.width size.cols))
-        |> Collage.group
+drawCells : ScreenRect -> Graph -> List Position -> Form
+drawCells =
+    drawAtNodes drawCell
 
 
 drawCell : Float -> ( Float, Float ) -> Form
@@ -184,12 +181,9 @@ drawCell size coordinates =
         |> Collage.move coordinates
 
 
-drawLanes : ScreenRect -> Graph -> Form
-drawLanes viewport { edges, size } =
-    edges
-        |> List.map (Utils.Tuple.map (toCoordinates viewport size))
-        |> List.map (drawLane (Math.ratio viewport.width size.cols))
-        |> Collage.group
+drawLanes : ScreenRect -> Graph -> List ( Position, Position ) -> Form
+drawLanes =
+    drawAtEdges drawEdge
 
 
 drawLane : Float -> ( ( Float, Float ), ( Float, Float ) ) -> Form
@@ -203,12 +197,22 @@ drawLane size coordinates =
 -- NODES
 
 
-drawNodes : ScreenRect -> Graph -> Form
-drawNodes viewport { nodes, size } =
+drawAtNodes :
+    (Float -> ( Float, Float ) -> Form)
+    -> ScreenRect
+    -> Graph
+    -> List Position
+    -> Form
+drawAtNodes drawShape viewport { size } nodes =
     nodes
         |> List.map (toCoordinates viewport size)
-        |> List.map (drawNode (Math.ratio viewport.width size.cols))
+        |> List.map (drawShape (Math.ratio viewport.width size.cols))
         |> Collage.group
+
+
+drawNodes : ScreenRect -> Graph -> List Position -> Form
+drawNodes =
+    drawAtNodes drawNode
 
 
 drawNode : Float -> ( Float, Float ) -> Form
@@ -220,12 +224,22 @@ drawNode size coordinates =
 -- EDGES
 
 
-drawEdges : ScreenRect -> Graph -> Form
-drawEdges viewport { edges, size } =
+drawAtEdges :
+    (Float -> ( ( Float, Float ), ( Float, Float ) ) -> Form)
+    -> ScreenRect
+    -> Graph
+    -> List ( Position, Position )
+    -> Form
+drawAtEdges drawShape viewport { size } edges =
     edges
         |> List.map (Utils.Tuple.map (toCoordinates viewport size))
-        |> List.map (drawEdge (Math.ratio viewport.width size.cols))
+        |> List.map (drawShape (Math.ratio viewport.width size.cols))
         |> Collage.group
+
+
+drawEdges : ScreenRect -> Graph -> List ( Position, Position ) -> Form
+drawEdges =
+    drawAtEdges drawEdge
 
 
 drawEdge : Float -> ( ( Float, Float ), ( Float, Float ) ) -> Form
@@ -246,42 +260,26 @@ drawSelection viewport graph selection =
         NothingToSelect ->
             Element.empty |> Collage.toForm
 
-        NodeSelection _ selectionPosition ->
-            drawSelectedNodes viewport graph selectionPosition
+        NodeSelection _ selectedNodes ->
+            drawSelectedNodes viewport graph (Selection.toList selectedNodes)
 
-        EdgeSelection _ selectionPositionPair ->
-            drawSelectedEdges viewport graph selectionPositionPair
-
-
-drawSelectedNodes : ScreenRect -> Graph -> Selection Position -> Form
-drawSelectedNodes viewport { nodes, size } selection =
-    let
-        selectedNodes =
-            Selection.toValues selection
-    in
-        nodes
-            |> List.filter (Selection.isSelected selectedNodes)
-            |> List.map (toCoordinates viewport size)
-            |> List.map (drawSelectedNode (Math.ratio viewport.width size.cols))
-            |> Collage.group
+        EdgeSelection _ selectedEdges ->
+            drawSelectedEdges viewport graph (Selection.toList selectedEdges)
 
 
-drawSelectedEdges : ScreenRect -> Graph -> Selection ( Position, Position ) -> Form
-drawSelectedEdges viewport { edges, size } selection =
-    let
-        selectedEdges =
-            Selection.toValues selection
-    in
-        edges
-            |> List.filter (Selection.isSelected selectedEdges)
-            |> List.map (Utils.Tuple.map (toCoordinates viewport size))
-            |> List.map (drawSelectedEdge (Math.ratio viewport.width size.cols))
-            |> Collage.group
+drawSelectedNodes : ScreenRect -> Graph -> List Position -> Form
+drawSelectedNodes =
+    drawAtNodes drawSelectedNode
 
 
 drawSelectedNode : Float -> ( Float, Float ) -> Form
 drawSelectedNode size coordinates =
     circle colors.orange (Config.markerRatio * size) coordinates
+
+
+drawSelectedEdges : ScreenRect -> Graph -> List ( Position, Position ) -> Form
+drawSelectedEdges =
+    drawAtEdges drawSelectedEdge
 
 
 drawSelectedEdge : Float -> ( ( Float, Float ), ( Float, Float ) ) -> Form
