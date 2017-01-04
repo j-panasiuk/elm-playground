@@ -93,7 +93,7 @@ drawLayer layer viewport { graph, editor } =
             drawGridBetweenTiles viewport graph
 
         SelectionLayer ->
-            drawSelection viewport graph editor.selection
+            drawSelection viewport graph editor
 
 
 
@@ -183,7 +183,7 @@ drawCell size coordinates =
 
 drawLanes : ScreenRect -> Graph -> List ( Position, Position ) -> Form
 drawLanes =
-    drawAtEdges drawEdge
+    drawAtEdges drawLane
 
 
 drawLane : Float -> ( ( Float, Float ), ( Float, Float ) ) -> Form
@@ -254,16 +254,22 @@ drawEdge size segment =
 -- SELECTION
 
 
-drawSelection : ScreenRect -> Graph -> EditorSelection -> Form
-drawSelection viewport graph selection =
-    case selection of
-        NothingToSelect ->
+drawSelection : ScreenRect -> Graph -> Editor -> Form
+drawSelection viewport graph { selection, pathEdges } =
+    case ( selection, pathEdges ) of
+        ( NothingToSelect, _ ) ->
             Element.empty |> Collage.toForm
 
-        NodeSelection _ selectedNodes ->
+        ( NodeSelection _ selectedNodes, Just edges ) ->
+            [ drawSelectedNodes viewport graph (Selection.toList selectedNodes)
+            , drawPath viewport graph edges
+            ]
+                |> Collage.group
+
+        ( NodeSelection _ selectedNodes, Nothing ) ->
             drawSelectedNodes viewport graph (Selection.toList selectedNodes)
 
-        EdgeSelection _ selectedEdges ->
+        ( EdgeSelection _ selectedEdges, _ ) ->
             drawSelectedEdges viewport graph (Selection.toList selectedEdges)
 
 
@@ -288,6 +294,11 @@ drawSelectedEdge size segment =
     , diamond colors.orange (Config.markerRatio * size) (Utils.Tuple.middle segment)
     ]
         |> Collage.group
+
+
+drawPath : ScreenRect -> Graph -> List ( Position, Position ) -> Form
+drawPath viewport graph edges =
+    drawSelectedEdges viewport graph edges
 
 
 

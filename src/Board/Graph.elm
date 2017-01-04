@@ -6,6 +6,7 @@ module Board.Graph
         , edges
         , neighbors
         , findPath
+        , findPathEdges
         , isNode
         , isEdge
         )
@@ -117,6 +118,13 @@ findPath =
     AStar.findPath costFunction moveFunction
 
 
+findPathEdges : Position -> Position -> Maybe (List ( Position, Position ))
+findPathEdges origin destination =
+    findPath origin destination
+        |> Maybe.map ((::) origin)
+        |> Maybe.map collectEdges
+
+
 isNode : Position -> Bool
 isNode position =
     List.member position nodes
@@ -125,3 +133,10 @@ isNode position =
 isEdge : ( Position, Position ) -> Bool
 isEdge pair =
     List.member pair edges
+
+
+collectEdges : List Position -> List ( Position, Position )
+collectEdges path =
+    path
+        |> List.Extra.zip (List.drop 1 path)
+        |> List.map Utils.Tuple.sort

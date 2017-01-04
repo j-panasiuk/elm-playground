@@ -112,6 +112,7 @@ type alias Editor =
     { mode : EditorMode
     , canvas : Canvas
     , selection : EditorSelection
+    , pathEdges : Maybe (List ( Position, Position ))
     }
 
 
