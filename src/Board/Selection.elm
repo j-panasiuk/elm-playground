@@ -31,23 +31,39 @@ init mode =
 {-| Translate selected board point to selectable object and add it to selection.
 For now let's assume there is no toggle-select behaviour.
 -}
-selectPoint : Int -> ScreenPoint -> EditorSelection -> EditorSelection
-selectPoint tileSize screenPoint selection =
+selectPoint : Graph -> Int -> ScreenPoint -> EditorSelection -> EditorSelection
+selectPoint graph tileSize screenPoint selection =
     case selection of
         NothingToSelect ->
             NothingToSelect
 
         NodeSelection mode nodeSelection ->
             let
+                nodeToSelect =
+                    Overlay.toNode graph tileSize screenPoint
+
                 updatedSelection =
-                    (handleSelect mode) (Overlay.toPosition tileSize screenPoint) nodeSelection
+                    case nodeToSelect of
+                        Just node ->
+                            (handleSelect mode) node nodeSelection
+
+                        Nothing ->
+                            nodeSelection
             in
                 NodeSelection mode updatedSelection
 
         EdgeSelection mode edgeSelection ->
             let
+                edgeToSelect =
+                    Overlay.toEdge graph tileSize screenPoint
+
                 updatedSelection =
-                    (handleSelect mode) (Overlay.toPositionPair tileSize screenPoint) edgeSelection
+                    case edgeToSelect of
+                        Just edge ->
+                            (handleSelect mode) edge edgeSelection
+
+                        Nothing ->
+                            edgeSelection
             in
                 EdgeSelection mode updatedSelection
 

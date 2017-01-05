@@ -2,6 +2,8 @@ module Board.Overlay
     exposing
         ( toPosition
         , toPositionPair
+        , toNode
+        , toEdge
         , flipVertical
         , shrinkBy
         )
@@ -29,6 +31,18 @@ toPosition tileSize { layerX, layerY } =
     )
 
 
+toNode : Graph -> Int -> ScreenPoint -> Maybe Position
+toNode { nodes } tileSize screenPoint =
+    let
+        position =
+            toPosition tileSize screenPoint
+    in
+        if List.member position nodes then
+            Just position
+        else
+            Nothing
+
+
 {-| Translate point on overlay to a pair of neighbor positions
 Translation is done using diagonal coordinates
 Result doesn't have to be a graph edge
@@ -53,6 +67,18 @@ toPositionPair tileSize { layerX, layerY } =
             ( (floor (toFloat (i + j) / 2)) => ((i - j - 1) // 2)
             , (ceiling (toFloat (i + j) / 2)) => ((i - j - 1) // 2)
             )
+
+
+toEdge : Graph -> Int -> ScreenPoint -> Maybe ( Position, Position )
+toEdge { edges } tileSize screenPoint =
+    let
+        positionPair =
+            toPositionPair tileSize screenPoint
+    in
+        if List.member positionPair edges then
+            Just positionPair
+        else
+            Nothing
 
 
 {-| Flip vertical point coordinate to align with traditional y axis

@@ -89,7 +89,7 @@ update msg ({ graph, board, editor } as model) =
         ClickEditorBoard clickPoint ->
             let
                 updatedEditor =
-                    editor |> Editor.select board.tileSize translatedPoint
+                    editor |> Editor.select model.graph board.tileSize translatedPoint
 
                 translatedPoint =
                     clickPoint |> Overlay.flipVertical board.viewport.height

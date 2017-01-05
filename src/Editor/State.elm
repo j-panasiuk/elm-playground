@@ -32,11 +32,11 @@ setMode mode editor =
     }
 
 
-select : Int -> ScreenPoint -> Editor -> Editor
-select tileSize screenPoint editor =
+select : Graph -> Int -> ScreenPoint -> Editor -> Editor
+select graph tileSize screenPoint editor =
     let
         newSelection =
-            Selection.selectPoint tileSize screenPoint editor.selection
+            Selection.selectPoint graph tileSize screenPoint editor.selection
 
         newPathEdges =
             case ( editor.mode, newSelection ) of
