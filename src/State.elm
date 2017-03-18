@@ -104,6 +104,6 @@ update msg ({ graph, board, editor } as model) =
 
 
 subscriptions : Model -> Sub Msg
-subscriptions model =
+subscriptions _ =
     Sub.batch
         [ Window.resizes Resize ]

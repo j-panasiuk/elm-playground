@@ -123,32 +123,35 @@ drawGridBetweenTiles { width, height } { size } =
         |> Collage.group
 
 
-drawGridAcrossTiles : ScreenRect -> Graph -> Form
-drawGridAcrossTiles { width, height } { size } =
-    [ List.range 0 (size.cols - 1)
-        |> List.map (toCoordinate width size.cols)
-        |> List.map (drawGridVerticalLine height)
-    , List.range 0 (size.rows - 1)
-        |> List.map (toCoordinate height size.rows)
-        |> List.map (drawGridHorizontalLine width)
-    ]
-        |> List.concat
-        |> Collage.group
+
+{-
+   drawGridAcrossTiles : ScreenRect -> Graph -> Form
+   drawGridAcrossTiles { width, height } { size } =
+       [ List.range 0 (size.cols - 1)
+           |> List.map (toCoordinate width size.cols)
+           |> List.map (drawGridVerticalLine height)
+       , List.range 0 (size.rows - 1)
+           |> List.map (toCoordinate height size.rows)
+           |> List.map (drawGridHorizontalLine width)
+       ]
+           |> List.concat
+           |> Collage.group
+-}
 
 
 drawGridVerticalLine : Int -> Float -> Form
 drawGridVerticalLine height x =
     gridLine
-        ( ( x, (toFloat -height) / 2 )
-        , ( x, (toFloat height) / 2 )
+        ( ( x, toFloat -height / 2 )
+        , ( x, toFloat height / 2 )
         )
 
 
 drawGridHorizontalLine : Int -> Float -> Form
 drawGridHorizontalLine width y =
     gridLine
-        ( ( (toFloat -width) / 2, y )
-        , ( (toFloat width) / 2, y )
+        ( ( toFloat -width / 2, y )
+        , ( toFloat width / 2, y )
         )
 
 
@@ -357,11 +360,11 @@ line color width segment =
 
 
 -- HELPERS
-
-
-toCoordinate : Int -> Int -> Int -> Float
-toCoordinate size x i =
-    (size // (2 * x)) * (2 * i - x + 1) |> toFloat
+{-
+   toCoordinate : Int -> Int -> Int -> Float
+   toCoordinate size x i =
+       (size // (2 * x)) * (2 * i - x + 1) |> toFloat
+-}
 
 
 toCoordinates : ScreenRect -> GridSize -> ( Int, Int ) -> ( Float, Float )

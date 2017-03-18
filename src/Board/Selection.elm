@@ -45,7 +45,7 @@ selectPoint graph tileSize screenPoint selection =
                 updatedSelection =
                     case nodeToSelect of
                         Just node ->
-                            (handleSelect mode) node nodeSelection
+                            handleSelect mode node nodeSelection
 
                         Nothing ->
                             nodeSelection
@@ -60,7 +60,7 @@ selectPoint graph tileSize screenPoint selection =
                 updatedSelection =
                     case edgeToSelect of
                         Just edge ->
-                            (handleSelect mode) edge edgeSelection
+                            handleSelect mode edge edgeSelection
 
                         Nothing ->
                             edgeSelection
@@ -93,7 +93,7 @@ add value selection =
         Double ( Nothing, Just v2 ) ->
             Double ( Just v2, Just value )
 
-        Double ( Just v1, Just v2 ) ->
+        Double ( Just v1, Just _ ) ->
             Double ( Just v1, Just value )
 
         Multiple values ->

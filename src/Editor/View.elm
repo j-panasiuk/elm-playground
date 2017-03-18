@@ -11,11 +11,11 @@ import Styles.Stylesheet as Stylesheet exposing (Class(..))
 import Color exposing (Color)
 import Element
 import FontAwesome as FA
-import View.Config as Config exposing (offset)
+import View.Config as Config
 import Board.Canvas as Canvas
 
 
-{ class, classList } =
+{ class } =
     Stylesheet.stylesheet
 
 
@@ -86,7 +86,7 @@ viewBoardCanvas boardSize model =
 
 
 viewBoardOverlay : Model -> Html Msg
-viewBoardOverlay model =
+viewBoardOverlay _ =
     div
         [ class BoardOverlay
         , on "click" (Json.Decode.map ClickEditorBoard Types.screenPoint)

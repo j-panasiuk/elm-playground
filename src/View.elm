@@ -5,7 +5,7 @@ import Routes
 import Types exposing (Model)
 import Messages exposing (Msg)
 import Style
-import Styles.Base as Base exposing (colors)
+import Styles.Base exposing (colors)
 import Styles.Layouts as Layouts
 import Styles.Stylesheet as Stylesheet exposing (Class(..))
 import View.Elements as Elements
@@ -14,7 +14,7 @@ import Editor.View
 import FontAwesome as FA
 
 
-{ class, classList } =
+{ class } =
     Stylesheet.stylesheet
 
 
@@ -30,7 +30,7 @@ view model =
 
 
 viewTopNav : Model -> Html Msg
-viewTopNav model =
+viewTopNav _ =
     nav [ class Nav ]
         [ Layouts.centeredNoSpacing
             [ Elements.link "" [] [ Elements.icon FA.home colors.grey.dark ]
@@ -46,7 +46,7 @@ viewTopNav model =
 
 viewPage : Model -> Html Msg
 viewPage model =
-    div [{- class Container -}]
+    div []
         (case model.route of
             Just (Routes.Game) ->
                 [ Game.View.view model

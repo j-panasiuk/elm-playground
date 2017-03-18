@@ -26,10 +26,10 @@ scaleToFit { width, height } { cols, rows } =
             Math.ratio cols rows
     in
         if viewportRatio > boardRatio then
-            { width = round ((toFloat (height * cols)) / (toFloat rows))
+            { width = round (toFloat (height * cols) / toFloat rows)
             , height = height
             }
         else
             { width = width
-            , height = round ((toFloat (width * rows)) / (toFloat cols))
+            , height = round (toFloat (width * rows) / toFloat cols)
             }

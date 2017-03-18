@@ -7,7 +7,7 @@ import Messages exposing (Msg)
 import Styles.Stylesheet as Stylesheet exposing (Class(..))
 
 
-{ class, classList } =
+{ class } =
     Stylesheet.stylesheet
 
 

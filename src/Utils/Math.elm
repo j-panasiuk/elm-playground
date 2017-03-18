@@ -5,10 +5,7 @@ import Types exposing (ScreenRect)
 
 ratio : Int -> Int -> Float
 ratio x y =
-    if y /= 0 then
-        (toFloat x) / (toFloat y)
-    else
-        Debug.crash "Dividing by zero, are we?"
+    toFloat x / toFloat y
 
 
 rectRatio : ScreenRect -> Float
@@ -18,10 +15,7 @@ rectRatio { width, height } =
 
 invert : Float -> Float
 invert x =
-    if x /= 0 then
-        1 / x
-    else
-        Debug.crash "Dividing by zero, are we?"
+    1 / x
 
 
 scale : Float -> Int -> Int

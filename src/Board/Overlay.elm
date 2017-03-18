@@ -59,13 +59,13 @@ toPositionPair tileSize { layerX, layerY } =
     in
         if (i + j) % 2 == 0 then
             -- Edge is along vertical path
-            ( ((i + j) // 2) => (floor (toFloat (i - j - 1) / 2))
-            , ((i + j) // 2) => (ceiling (toFloat (i - j - 1) / 2))
+            ( ((i + j) // 2) => floor (toFloat (i - j - 1) / 2)
+            , ((i + j) // 2) => ceiling (toFloat (i - j - 1) / 2)
             )
         else
             -- Edge is along horizontal path
-            ( (floor (toFloat (i + j) / 2)) => ((i - j - 1) // 2)
-            , (ceiling (toFloat (i + j) / 2)) => ((i - j - 1) // 2)
+            ( floor (toFloat (i + j) / 2) => ((i - j - 1) // 2)
+            , ceiling (toFloat (i + j) / 2) => ((i - j - 1) // 2)
             )
 
 

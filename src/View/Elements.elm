@@ -10,7 +10,7 @@ import FontAwesome as FA
 import View.Config as Config
 
 
-{ class, classList } =
+{ class } =
     Stylesheet.stylesheet
 
 
