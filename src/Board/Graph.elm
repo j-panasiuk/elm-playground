@@ -23,7 +23,7 @@ import Utils.Tuple
 
 level : Level
 level =
-    Levels.level1
+    Levels.loadLevel 3
 
 
 graph : Graph

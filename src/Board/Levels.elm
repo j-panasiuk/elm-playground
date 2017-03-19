@@ -1,112 +1,207 @@
-module Board.Levels exposing (..)
+module Board.Levels exposing (levels, loadLevel)
 
-import Types exposing (Level)
-
-
-(=>) : a -> b -> ( a, b )
-(=>) =
-    (,)
+import Types exposing (Level, Position)
+import List.Extra
 
 
-
--- (0,3)             (2,3)
---   |                 |
--- (0,2) -- (1,2) -- (2,2) -- (3,2)
---   |        |        |        |
--- (0,1) -- (1,1)    (2,1) -- (3,1)
---            |                 |
--- (0,0) -- (1,0) -- (2,0) -- (3,0)
+loadLevel : Int -> Level
+loadLevel id =
+    levels
+        |> List.Extra.find (.id >> (==) id)
+        |> Maybe.withDefault (Level 0 [])
 
 
-level0 : Level
-level0 =
-    { edges =
-        [ ( 0, 0 ) => ( 1, 0 )
-        , ( 0, 1 ) => ( 1, 1 )
-        , ( 0, 1 ) => ( 0, 2 )
-        , ( 0, 2 ) => ( 0, 3 )
-        , ( 0, 2 ) => ( 1, 2 )
-        , ( 1, 0 ) => ( 1, 1 )
-        , ( 1, 0 ) => ( 2, 0 )
-        , ( 1, 1 ) => ( 1, 2 )
-        , ( 1, 2 ) => ( 2, 2 )
-        , ( 2, 0 ) => ( 3, 0 )
-        , ( 2, 1 ) => ( 2, 2 )
-        , ( 2, 1 ) => ( 3, 1 )
-        , ( 2, 2 ) => ( 2, 3 )
-        , ( 2, 2 ) => ( 3, 2 )
-        , ( 3, 0 ) => ( 3, 1 )
-        , ( 3, 1 ) => ( 3, 2 )
-        ]
-    }
+levels : List Level
+levels =
+    [ level1, level2, level3 ]
 
 
 
--- (0,7) -- (1,7) -- (2,7) -- (3,7) -- (4,7) -- (5,7) -- (6,7) -- (7,7)
---   |                                                              |
--- (0,6)                                                          (7,6)
---   |                                                              |
--- (0,5)                                        (5,5) -- (6,5) -- (7,5)
---   |                                            |                 |
--- (0,4) -- (1,4)                               (5,4)    (6,4) -- (7,4)
---            |                                   |        |
--- (0,3) -- (1,3) -- (2,3) -- (3,3)    (4,3) -- (5,3)    (6,3) -- (7,3)
---   |                 |                          |                 |
--- (0,2)             (2,2) -- (3,2) -- (4,2) -- (5,2) -- (6,2)    (7,2)
---   |                                                              |
--- (0,1)             (2,1)                                        (7,1)
---   |                 |                                            |
--- (0,0) -- (1,0) -- (2,0) -- (3,0) -- (4,0) -- (5,0) -- (6,0) -- (7,0)
+-- LEVELS
 
 
 level1 : Level
 level1 =
-    { edges =
-        [ ( 0, 0 ) => ( 0, 1 )
-        , ( 0, 0 ) => ( 1, 0 )
-        , ( 0, 1 ) => ( 0, 2 )
-        , ( 0, 2 ) => ( 0, 3 )
-        , ( 0, 3 ) => ( 1, 3 )
-        , ( 0, 4 ) => ( 0, 5 )
-        , ( 0, 4 ) => ( 1, 4 )
-        , ( 0, 5 ) => ( 0, 6 )
-        , ( 0, 6 ) => ( 0, 7 )
-        , ( 0, 7 ) => ( 1, 7 )
-        , ( 1, 0 ) => ( 2, 0 )
-        , ( 1, 3 ) => ( 1, 4 )
-        , ( 1, 3 ) => ( 2, 3 )
-        , ( 1, 7 ) => ( 2, 7 )
-        , ( 2, 0 ) => ( 2, 1 )
-        , ( 2, 0 ) => ( 3, 0 )
-        , ( 2, 2 ) => ( 2, 3 )
-        , ( 2, 2 ) => ( 3, 2 )
-        , ( 2, 3 ) => ( 3, 3 )
-        , ( 2, 7 ) => ( 3, 7 )
-        , ( 3, 0 ) => ( 4, 0 )
-        , ( 3, 2 ) => ( 4, 2 )
-        , ( 3, 7 ) => ( 4, 7 )
-        , ( 4, 0 ) => ( 5, 0 )
-        , ( 4, 2 ) => ( 5, 2 )
-        , ( 4, 3 ) => ( 5, 3 )
-        , ( 4, 7 ) => ( 5, 7 )
-        , ( 5, 0 ) => ( 6, 0 )
-        , ( 5, 2 ) => ( 5, 3 )
-        , ( 5, 2 ) => ( 6, 2 )
-        , ( 5, 3 ) => ( 5, 4 )
-        , ( 5, 4 ) => ( 5, 5 )
-        , ( 5, 5 ) => ( 6, 5 )
-        , ( 5, 7 ) => ( 6, 7 )
-        , ( 6, 0 ) => ( 7, 0 )
-        , ( 6, 3 ) => ( 6, 4 )
-        , ( 6, 3 ) => ( 7, 3 )
-        , ( 6, 4 ) => ( 7, 4 )
-        , ( 6, 5 ) => ( 7, 5 )
-        , ( 6, 7 ) => ( 7, 7 )
-        , ( 7, 0 ) => ( 7, 1 )
-        , ( 7, 1 ) => ( 7, 2 )
-        , ( 7, 2 ) => ( 7, 3 )
-        , ( 7, 4 ) => ( 7, 5 )
-        , ( 7, 5 ) => ( 7, 6 )
-        , ( 7, 6 ) => ( 7, 7 )
-        ]
+    { id = 1
+    , edges = parseEdges level1Shape
     }
+
+
+level1Shape : String
+level1Shape =
+    """
+│ │
+├┬┼┐
+└┤└┤
+─┴─┘
+"""
+
+
+level2 : Level
+level2 =
+    { id = 2
+    , edges = parseEdges level2Shape
+    }
+
+
+level2Shape : String
+level2Shape =
+    """
+┌──┬───┐
+│  │   │
+├─┬┴─┼─┤
+│    │ │
+│  └─┼ │
+└────┴─┘
+"""
+
+
+level3 : Level
+level3 =
+    { id = 3
+    , edges = parseEdges level3Shape
+    }
+
+
+level3Shape : String
+level3Shape =
+    """
+    ┌───┬──┐
+┌──┴┤   │  │
+├┬─ ┼┼  ┼─┘│
+│└┐  ┤    ┌┘
+│ └──┼┴─┬─┴┤
+├─┴┬    ┤  │
+├──┬┌───┤┌─┤
+│──┼┘ ┼─┬┘ │
+│  ───┘ ├┬─┘
+└───────┴┘
+"""
+
+
+
+-- HELPERS
+
+
+{-| Graph connections are bi-directional, so when building the graph from
+string representation we only need to check connections in one direction.
+
+So starting from bottom left corner (0, 0) we look for connections going
+up and/or right
+-}
+type Direction
+    = Up
+    | Right
+
+
+{-| Get list of edges based on level map
+-}
+parseEdges : String -> List ( Position, Position )
+parseEdges shape =
+    let
+        lines =
+            levelLines shape
+
+        chars =
+            levelLineChars lines
+
+        edges line cs =
+            cs
+                |> List.indexedMap (newEdgesFromNode line)
+                |> List.concat
+                |> List.filter
+                    (\( ( x1, y1 ), ( x2, y2 ) ) ->
+                        ( x1, y1 ) /= ( x2, y2 ) && x2 < levelWidth && y2 < levelHeight
+                    )
+
+        ( levelWidth, levelHeight ) =
+            levelSize lines
+    in
+        chars
+            |> List.indexedMap edges
+            |> List.concat
+
+
+{-| Calculate level dimensions to trim outer edges
+-}
+levelSize : List String -> ( Int, Int )
+levelSize lines =
+    ( lines |> List.map String.length |> List.maximum |> Maybe.withDefault 0
+    , lines |> List.length
+    )
+
+
+{-| Split level map into lines
+-}
+levelLines : String -> List String
+levelLines shape =
+    shape
+        |> String.lines
+        |> List.filter (not << String.isEmpty)
+        |> List.reverse
+
+
+{-| Split level map lines into single characters
+-}
+levelLineChars : List String -> List (List Char)
+levelLineChars lines =
+    lines
+        |> List.map String.toList
+
+
+{-| Get new edges coming out of given point
+Outgoing edges are encoded in shape of the character
+We only care about edges going up or right
+-}
+newEdgesFromNode : Int -> Int -> Char -> List ( Position, Position )
+newEdgesFromNode line index char =
+    let
+        newEdgeTowards direction =
+            (,) ( index, line ) <|
+                case direction of
+                    Up ->
+                        ( index, line + 1 )
+
+                    Right ->
+                        ( index + 1, line )
+    in
+        List.map newEdgeTowards <|
+            case char of
+                ' ' ->
+                    []
+
+                '│' ->
+                    [ Up ]
+
+                '─' ->
+                    [ Right ]
+
+                '┐' ->
+                    []
+
+                '┌' ->
+                    [ Right ]
+
+                '┘' ->
+                    [ Up ]
+
+                '└' ->
+                    [ Up, Right ]
+
+                '┬' ->
+                    [ Right ]
+
+                '┤' ->
+                    [ Up ]
+
+                '├' ->
+                    [ Up, Right ]
+
+                '┴' ->
+                    [ Up, Right ]
+
+                '┼' ->
+                    [ Up, Right ]
+
+                _ ->
+                    []

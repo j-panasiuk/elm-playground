@@ -42,7 +42,8 @@ type alias ScreenPoint =
 
 
 type alias Level =
-    { edges : List ( Position, Position )
+    { id : Int
+    , edges : List ( Position, Position )
     }
 
 
